@@ -92,7 +92,7 @@ func Register() gin.HandlerFunc {
 			return
 		}
 
-		c.SetCookie("token", token, 3600, "/", "", false, true)
+		c.SetCookie("token", token, 60*60*24, "/", "", false, true)
 
 		response.SendJSON(c, gin.H{
 			"name":  user.Name,
