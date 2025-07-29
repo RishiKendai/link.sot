@@ -59,7 +59,7 @@ function Login({ handleModal }: LoginProps) {
         const isPasswordValid = validateField({ name: 'password', value: password, type: 'password', setError: setFormError })
         if (!isEmailValid || !isPasswordValid) return;
         loginMutation.mutate({
-            path: '/api/v1/login',
+            path: '/login',
             method: 'POST',
             payload: { email, password }
         }, {
