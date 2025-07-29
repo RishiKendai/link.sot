@@ -1,0 +1,36 @@
+.feature-card:nth-child(1) .feature-icon {
+  color: #7F00FF;
+  filter: drop-shadow(0px 4px 8px #e100ffe0);
+}
+
+.feature-card:nth-child(1):hover .face-1 {
+  background: linear-gradient(135deg, #7F00FF 0%, #E100FF 100%);
+}
+
+.feature-card:nth-child(2) .feature-icon {
+  color: #00C6FB;
+  filter: drop-shadow(0px 4px 8px #00c6fbe0);
+}
+
+.feature-card:nth-child(2):hover .face-1 {
+  background: linear-gradient(135deg, #00C6FB 0%, #005BEA 100%);
+}
+
+.feature-card:nth-child(3) .feature-icon {
+  color: #38EF7D;
+  filter: drop-shadow(0px 4px 8px #38ef7de0);
+}
+
+.feature-card:nth-child(3):hover .face-1 {
+  background: linear-gradient(135deg, #38EF7D 0%, #00F260 100%);
+}
+
+.feature-card:nth-child(4) .feature-icon {
+  color: #FF6A00;
+  filter: drop-shadow(0px 4px 8px #ff6a00e0);
+}
+
+.feature-card:hover .feature-icon {
+  color: white;
+  filter: drop-shadow(0px 4px 8px #fff);
+}
