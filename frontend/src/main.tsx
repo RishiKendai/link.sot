@@ -7,7 +7,7 @@ import App from './pages/App.tsx'
 import Layout from './Layout.tsx'
 
 import { AuthProvider } from './context/AuthContext.tsx'
-import './index.css'
+import './global.css'
 import ProtectedLayout from './context/ProtectedLayout.tsx'
 import Dashboard from './pages/Dashboard.tsx'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
