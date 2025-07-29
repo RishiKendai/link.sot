@@ -14,6 +14,7 @@ func Links(router *gin.RouterGroup) {
 	router.DELETE("/links/:id", services.Authenticate(), links.DeleteLinkHandler())
 	router.GET("/links/availability/:alias", services.Authenticate(), links.CheckAliasAvailabilityHandler())
 	router.GET("/links/preview/:url", services.Authenticate(), links.PreviewHandler())
+	router.GET("/links/search", services.Authenticate(), links.SearchLinksHandler())
 	// Public routes
 	router.GET("/r/:sot", links.RedirectHandler())
 	router.POST("/r/:sot/verify", links.VerifyPasswordHandler())

@@ -50,21 +50,28 @@ const Link: React.FC = () => {
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(0)
     const [pageSize, setPageSize] = useState(10)
+    const [search, setSearch] = useState('')
+    const [isSearching, setIsSearching] = useState(false)
     const navigate = useNavigate()
 
     const handleSearch = (search: string) => {
-        console.log(search)
+        setSearch(search)
+        setPage(1)
+        setIsSearching(!!search)
     }
 
+    // Fetch links (default or search)
     const { data, isPending, isError } = useApiQuery<{
         links: Link[];
         total: number;
         page: number;
         page_size: number;
     }>({
-        path: '/links',
-        queryParams: { page, page_size: pageSize },
-        key: ['links', page, pageSize],
+        path: isSearching ? '/links/search' : '/links',
+        queryParams: isSearching
+            ? { q: search, page, page_size: pageSize }
+            : { page, page_size: pageSize },
+        key: [isSearching ? 'links-search' : 'links', search, page, pageSize],
     })
 
     // Update links when data changes
@@ -202,13 +209,18 @@ const Link: React.FC = () => {
                         <div className='flex items-center justify-center h-full p-8 flex-col text-center w-full'>
                             <IconLink className='text-gray-400 mb-8 rotate-45' size={100} />
                             <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                                {isError ? 'Unable to Load Links' : 'No Short Links Yet!'}
+                                {isError
+                                    ? 'Unable to Load Links'
+                                    : isSearching
+                                        ? 'No links found for your search.'
+                                        : 'No Short Links Yet!'}
                             </h3>
                             <p className="text-gray-600 mb-8 max-w-md mx-auto">
                                 {isError
                                     ? 'There was an issue loading your links. Please try refreshing the page.'
-                                    : "It looks like you haven't created any short links. Use the section above to get started!"
-                                }
+                                    : isSearching
+                                        ? 'Try a different search term or create a new short link.'
+                                        : "It looks like you haven't created any short links. Use the section above to get started!"}
                             </p>
                             <Button
                                 label={isError ? 'Try Again' : 'Create Short Link'}

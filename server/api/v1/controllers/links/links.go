@@ -325,6 +325,89 @@ func GetLinksHandler() gin.HandlerFunc {
 	}
 }
 
+func SearchLinksHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		uid := c.GetString("uid")
+		query := c.Query("q")
+		if query == "" {
+			response.SendBadRequestError(c, "Missing search query", nil)
+			return
+		}
+
+		// Pagination params
+		page := 1
+		pageSize := 10
+		if p := c.Query("page"); p != "" {
+			fmt.Sscanf(p, "%d", &page)
+			if page < 1 {
+				page = 1
+			}
+		}
+		if ps := c.Query("page_size"); ps != "" {
+			fmt.Sscanf(ps, "%d", &pageSize)
+			if pageSize < 1 {
+				pageSize = 10
+			}
+		}
+		offset := (page - 1) * pageSize
+
+		// Get total count for search
+		totalQuery := `SELECT COUNT(*) FROM links WHERE user_uid = $1 AND (short_link ILIKE $2 OR original_link ILIKE $2)`
+		var total int
+		totalRow, err := postgres.FindOne(totalQuery, uid, "%"+query+"%")
+		if err != nil {
+			response.SendServerError(c, err, nil)
+			return
+		}
+		err = totalRow.Scan(&total)
+		if err != nil {
+			response.SendServerError(c, err, nil)
+			return
+		}
+
+		// Get paginated search results
+		searchQuery := `SELECT * FROM links WHERE user_uid = $1 AND (short_link ILIKE $2 OR original_link ILIKE $2) ORDER BY created_at DESC LIMIT $3 OFFSET $4`
+		sqlRows, err := postgres.FindMany(searchQuery, uid, "%"+query+"%", pageSize, offset)
+		if err != nil {
+			response.SendServerError(c, err, nil)
+			return
+		}
+		defer sqlRows.Close()
+		var links []Link
+		for sqlRows.Next() {
+			var link Link
+			var tagsJSON []byte
+			err = sqlRows.Scan(&link.User_uid, &link.Uid, &link.Original_url, &link.Short_link, &link.Is_custom_backoff, &link.Created_at, &link.Expiry_date, &link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at, &tagsJSON)
+			if err != nil {
+				response.SendServerError(c, err, nil)
+				return
+			}
+			link.Expiry_date = link.Expiry_date.UTC()
+			if len(tagsJSON) > 0 {
+				err = json.Unmarshal(tagsJSON, &link.Tags)
+				if err != nil {
+					response.SendServerError(c, err, nil)
+					return
+				}
+			} else {
+				link.Tags = []string{}
+			}
+			links = append(links, link)
+		}
+		if err = sqlRows.Err(); err != nil {
+			response.SendServerError(c, err, nil)
+			return
+		}
+		paginated := PaginatedLinksResponse{
+			Links:    links,
+			Total:    total,
+			Page:     page,
+			PageSize: pageSize,
+		}
+		response.SendJSON(c, paginated, nil)
+	}
+}
+
 func GetLinkHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
