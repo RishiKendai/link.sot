@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	apiV1 "github.com/RishiKendai/sot/api/v1"
@@ -9,23 +10,27 @@ import (
 	mongodb "github.com/RishiKendai/sot/pkg/database/mongo"
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 	rdb "github.com/RishiKendai/sot/pkg/database/redis"
+	"github.com/RishiKendai/sot/service/counter"
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	port := env.EnvPort()
+func init() {
 	mongodb.Connect()
 	postgres.Connect()
 	rdb.Connect()
+	counter.InitMasterCounter()
+}
+
+func main() {
+	port := env.EnvPort()
+
+	// Start analytics cron service in background
+	// go cron.RunWithInterval(8 * time.Second)
+	fmt.Println("Cron service started")
 
 	router := gin.Default()
-
-	// Middleware
+	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Use(middleware.CORSMiddleware())
-	router.Use(middleware.SecurityHeaders())
-	router.Use(middleware.ErrorHandler)
-	router.Use(middleware.SaveRequestBody)
-	router.Use(middleware.RestoreRequestBody)
 
 	internalAPI := router.Group("/api/v1")
 	{
@@ -42,5 +47,5 @@ func main() {
 		})
 	})
 
-	router.Run("127.0.0.1:" + port)
+	router.Run("localhost:" + port)
 }
