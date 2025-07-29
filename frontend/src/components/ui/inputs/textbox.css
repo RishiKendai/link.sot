@@ -1,0 +1,30 @@
+.input-box {
+    display: flex;
+    width: 100%;
+    border-radius: 8px;
+    padding-block: 8px;
+    padding-inline: 1rem;
+    background-color: var(--clr-primary);
+    border: 1px solid var(--clr-border);
+
+    color: var(--text-primary);
+    /* pointer-events: none; */
+}
+
+.input-box:has(input:disabled) {
+    background-color: #EEF2F6;
+    border: none;
+}
+
+.input-box input {
+    width: 100%;
+    outline: none;
+    background: transparent;
+    border: none;
+}
+
+.input-box input::placeholder {
+    color: var(--text-primary);
+    opacity: 0.3;
+    font-weight: 500;
+}

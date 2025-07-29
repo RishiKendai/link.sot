@@ -1,0 +1,120 @@
+.chip-input-wrapper {
+  position: relative;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background-color: var(--clr-primary);
+  color: var(--text-primary);
+  transition: all 0.2s ease-in-out;
+  min-height: 40px;
+  max-height: 100px;
+  cursor: text;
+}
+
+.chip-input-wrapper.error {
+  border-color: #ef4444;
+}
+
+.chip-input-wrapper.disabled {
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: var(--clr-primary);
+  border: 1px solid var(--clr-border);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  user-select: none;
+}
+
+.chip:hover {
+  background-color: #f3f4f6;
+}
+
+.chip-value {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.chip-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s ease-in-out;
+  flex-shrink: 0;
+}
+
+.chip-remove:hover {
+  background-color: #ffe2e2;
+}
+
+.chip-remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.chip-remove svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.chip-input-field {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: #374151;
+  padding: 0.25rem 0;
+}
+
+.chip-input-field::placeholder {
+  color: #9ca3af;
+}
+
+.chip-input-field:disabled {
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
+.chip-input-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 0.25rem;
+}
+
+.chip-input-counter {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: right;
+  margin-top: 0.25rem;
+}

@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+@layer {
+    
+    button.primary {
+        @apply bg-[var(--black-800)] text-white;
+
+        &:hover {
+            @apply bg-black;
+        }
+    }
+
+    button.secondary {
+        @apply bg-none text-[var(--black-700)] border border-gray-600;
+
+        &:hover {
+            @apply bg-gray-200 text-black border-gray-200;
+        }
+    }
+
+    button.tertiary {
+        @apply bg-transparent text-[var(--black-700)];
+
+        &:hover {
+            @apply text-black bg-gray-100;
+        }
+    }
+
+    button:disabled {
+        @apply opacity-90 cursor-not-allowed;
+    }
+
+
+}
