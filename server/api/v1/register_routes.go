@@ -7,7 +7,7 @@ import (
 
 func RegisterRoutes(router *gin.RouterGroup) {
 	routes.Register(router)
-	routes.Login(router)
+	routes.Auth(router)
 	routes.Links(router)
 	routes.Analytics(router)
 }
