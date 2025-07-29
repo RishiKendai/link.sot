@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+        {
+            "source": "/proxy/(.*)",
+            "destination": "https://sotly-backend.onrender.com/api/v1/$1"
+        }
+    ]
+}
