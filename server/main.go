@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	apiV1 "github.com/RishiKendai/sot/api/v1"
+	routes "github.com/RishiKendai/sot/api/v1/routes"
 	"github.com/RishiKendai/sot/middleware"
 	"github.com/RishiKendai/sot/pkg/config/env"
 	mongodb "github.com/RishiKendai/sot/pkg/database/mongo"
@@ -32,10 +33,18 @@ func main() {
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Use(middleware.CORSMiddleware())
 
+	// Load HTML templates for static pages
+	router.Static("/assets", "./assets")
+
+	router.LoadHTMLGlob("templates/*.html")
+
 	internalAPI := router.Group("/api/v1")
 	{
 		apiV1.RegisterRoutes(internalAPI)
 	}
+
+	// Register public short link routes (no prefix)
+	routes.RegisterPublicRoutes(router)
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

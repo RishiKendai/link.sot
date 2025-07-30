@@ -148,32 +148,28 @@ func RedirectHandler() gin.HandlerFunc {
 		err = sqlRow.Scan(&link.User_uid, &link.Uid, &link.Original_url, &link.Short_link, &link.Is_custom_backoff, &link.Created_at, &link.Expiry_date, &link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at, &tagsJSON)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				response.SendNotFoundError(c, "Short link not found", nil)
+				response.ServeHTMLFile(c, "link_not_found.html", 404)
 				return
 			}
 			response.SendServerError(c, err, nil)
 			return
 		}
-
-		// Check if link has expired
+		if link.Deleted {
+			response.ServeHTMLFile(c, "link_deleted.html", 410)
+			return
+		}
 		if !link.Expiry_date.IsZero() && time.Now().UTC().After(link.Expiry_date) {
-			response.SendBadRequestError(c, "Link has expired", nil)
+			response.ServeHTMLFile(c, "link_expired.html", 410)
 			return
 		}
 
 		// Check if link is password protected
 		if link.Password != nil && *link.Password != "" {
-			// Return password protection status instead of redirecting
-			base := env.GetEnvKey("FE_BASE_URL")
-			if base == "" {
-				log.Fatalf("FE_BASE_URL is not set")
-			}
-			c.Redirect(http.StatusTemporaryRedirect, base+"/"+sot+"/password")
-			// c.JSON(http.StatusOK, gin.H{
-			// 	"isPasswordProtected": true,
-			// 	"shortLink":           sot,
-			// 	"message":             "This link is password protected",
-			// })
+			response.ServeHTML(c, 401, "link_password.html", bson.M{
+				"Error":    "",
+				"Password": "",
+				"Action":   "/" + link.Short_link + "/verify",
+			})
 			return
 		}
 
@@ -270,7 +266,7 @@ func GetLinksHandler() gin.HandlerFunc {
 
 		// Get total count
 		var total int
-		totalRow, err := postgres.FindOne("SELECT COUNT(*) FROM links WHERE user_uid = $1", uid)
+		totalRow, err := postgres.FindOne("SELECT COUNT(*) FROM links WHERE user_uid = $1 AND deleted = false", uid)
 		if err != nil {
 			response.SendServerError(c, err, nil)
 			return
@@ -626,7 +622,7 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 		shortLink := c.Param("sot")
 
 		var payload PasswordVerificationPayload
-		if err := c.ShouldBindJSON(&payload); err != nil {
+		if err := c.ShouldBind(&payload); err != nil {
 			fmt.Println("Error: ", err)
 			response.SendBadRequestError(c, "Invalid request body", nil)
 			return
@@ -659,7 +655,12 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 		// Verify password
 		fmt.Println("Password: ", *link.Password, payload.Password)
 		if *link.Password != payload.Password {
-			response.SendBadRequestError(c, "Incorrect password", nil)
+			// response.SendBadRequestError(c, "Incorrect password", nil)
+			response.ServeHTML(c, 401, "link_password.html", bson.M{
+				"Error":    "Incorrect password",
+				"Password": payload.Password,
+				"Action":   "/" + link.Short_link + "/verify",
+			})
 			return
 		}
 
@@ -669,12 +670,20 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 			return
 		}
 
-		token := generateToken(shortLink)
-
-		// Password is correct, return the original URL
+		// Password is correct, redirect to the original URL
 		// Track analytics with QR code information
-		fmt.Println("Token: ", token)
-		response.SendJSON(c, bson.M{"token": token}, nil)
+		isQR := c.Query("r") == "qr"
+		ua := c.Request.UserAgent()
+		ip := getClientIP(c)
+		sot := c.Param("sot")
+		referrer := c.Request.Header.Get("Referer")
+		services.PushAnalytics(sot, ip, ua, isQR, referrer)
+
+		fmt.Println("Link: ", link.Original_url)
+		c.Header("Cache-Control", fmt.Sprintf("private, max-age=%d", 5*60))
+		c.Header("Content-Security-Policy", "referer always;")
+		c.Header("Referrer-Policy", "unsafe-url")
+		c.Redirect(http.StatusMovedPermanently, link.Original_url)
 	}
 }
 

@@ -15,11 +15,12 @@ func Links(router *gin.RouterGroup) {
 	router.GET("/links/availability/:alias", services.Authenticate(), links.CheckAliasAvailabilityHandler())
 	router.GET("/links/preview/:url", services.Authenticate(), links.PreviewHandler())
 	router.GET("/links/search", services.Authenticate(), links.SearchLinksHandler())
-	// Public routes
-	router.GET("/r/:sot", links.RedirectHandler())
-	router.POST("/r/:sot/verify", links.VerifyPasswordHandler())
-	router.GET("/r/:sot/protected/:token", links.RedirectProtectedHandler())
-	// QR code route - same handler but different tracking
+}
+
+// RegisterPublicRoutes registers public short link handlers on the root router (no prefix)
+func RegisterPublicRoutes(router *gin.Engine) {
+	router.GET("/:sot", links.RedirectHandler())
+	router.POST("/:sot/verify", links.VerifyPasswordHandler())
 }
 
 /*
