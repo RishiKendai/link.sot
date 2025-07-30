@@ -42,7 +42,7 @@ type Link = {
 }
 
 // const gradientList = ['gpb', 'gct', 'gge', 'gor']
-const baseURL = import.meta.env.VITE_FRONTEND_LINK
+const baseURL = import.meta.env.VITE_SOT_HOST
 
 const Link: React.FC = () => {
     const [links, setLinks] = useState<Link[]>([])
