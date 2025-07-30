@@ -79,48 +79,55 @@ const LinkCreate = () => {
     }
 
     return (
-        <section className='flex flex-col p-8 rounded-md w-full'>
-            <h2 className='text-2xl font-bold text-gray-900 mb-6'>Create a New Short Link</h2>
+        <section className='min-h-screen flex flex-col py-8 w-full'>
             <form onSubmit={handleSubmit}>
-                <div className='flex flex-col w-full space-y-7'>
-                    <TextBox
-                        label='Original URL'
-                        name='url'
-                        type='url'
-                        placeholder='https://www.example.com'
-                        id='url'
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                    />
+                <div className='flex flex-col w-full space-y-7 px-2 md:px-8 max-w-5xl justify-self-center'>
+                    <h2 className='text-2xl font-bold text-gray-900 mb-6'>Create a New Short Link</h2>
+                    <div className="group-fields card-group w-full">
+                        <div className='card-item'>
+                            <TextBox
+                                label='Original URL'
+                                name='url'
+                                type='url'
+                                placeholder='https://www.example.com'
+                                id='url'
+                                value={url}
+                                onChange={(e) => setUrl(e.target.value)}
+                            />
+                        </div>
 
-                    {/* Custom back-half */}
-                    <div className='flex items-end gap-2 w-full'>
-                        <TextBox
-                            label='Custom Back-Half'
-                            name='custom-back-half'
-                            type='text'
-                            placeholder='custom-back-half'
-                            id='custom-back-half-base'
-                            value={baseURL}
-                            className='text-gray-400'
-                            disabled
-                        />
-                        <span className='text-black leading-6 py-2'>/</span>
-                        <TextBox
-                            name='custom-back-half'
-                            type='text'
-                            placeholder='custom-back-half'
-                            id='custom-back-half'
-                            value={customBackHalf}
-                            wrapperClass='w-1/2'
-                            onChange={(e) => setCustomBackHalf(e.target.value)}
-                        />
+                        {/* Custom back-half */}
+                        <div className='card-item'>
+                            <div className='flex items-end gap-2 w-full'>
+                                <TextBox
+                                    label='Custom Back-Half'
+                                    name='custom-back-half'
+                                    type='text'
+                                    placeholder='custom-back-half'
+                                    id='custom-back-half-base'
+                                    value={baseURL}
+                                    className='text-gray-400'
+                                    disabled
+                                />
+                                <span className='text-black leading-6 py-2'>/</span>
+                                <TextBox
+                                    name='custom-back-half'
+                                    type='text'
+                                    placeholder='custom-back-half'
+                                    id='custom-back-half'
+                                    value={customBackHalf}
+                                    wrapperClass='w-full'
+                                    onChange={(e) => setCustomBackHalf(e.target.value)}
+                                />
+                            </div>
+                        </div>
                     </div>
-
-
+                    <h5 className='text-lg font-semibold text-gray-900 mb-4'>Advanced Settings</h5>
                     {/* Expiry date, password, and protection */}
-                    <div className='grid grid-cols-2 gap-8'>
-                        <div className='flex flex-col gap-8 relative'>
+                    <div className="card-group">
+                        <div className="card-item">
+                            {/* <div className='grid grid-cols-2 gap-8'> */}
+                            {/* <div className='flex flex-col gap-8 relative'> */}
                             <TextBox
                                 onClick={() => setShowCalendar(true)}
                                 label='Expiry Date (Optional)'
@@ -140,6 +147,35 @@ const LinkCreate = () => {
                                     expiryDate={expiryDate}
                                 />
                             )}
+                            {/* </div> */}
+                        </div>
+                        <div className="card-item">
+                            <div className='flex flex-col gap-3'>
+                                <TextBox
+                                    label='Password (Optional)'
+                                    name='password'
+                                    type='text'
+                                    id='password'
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder='Enter password'
+                                />
+                            </div>
+                        </div>
+                        {/* </div> */}
+
+                        {/* Tags */}
+                        <div className="card-item">
+                            <ChipInput
+                                label='Tags (Optional)'
+                                name='tags'
+                                placeholder='Add tags...'
+                                initialValues={tags}
+                                onValuesChange={setTags}
+                                maxChips={10}
+                            />
+                        </div>
+                        <div className="card-item">
                             <Checkbox
                                 label='Enable Protection (Auto scan for malicious email)'
                                 id='scan-link'
@@ -147,28 +183,7 @@ const LinkCreate = () => {
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setScanLink(e.target.checked)}
                             />
                         </div>
-                        <div className='flex flex-col gap-3'>
-                            <TextBox
-                                label='Password (Optional)'
-                                name='password'
-                                type='text'
-                                id='password'
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder='Enter password'
-                            />
-                        </div>
                     </div>
-
-                    {/* Tags */}
-                    <ChipInput
-                        label='Tags (Optional)'
-                        name='tags'
-                        placeholder='Add tags...'
-                        initialValues={tags}
-                        onValuesChange={setTags}
-                        maxChips={10}
-                    />
 
                     {error && <Alert type='danger' message={error} className='mb-4' />}
                     <div className='flex w-full justify-end'>
@@ -177,19 +192,21 @@ const LinkCreate = () => {
                     </div>
                 </div>
             </form>
-            {showModal && (
-                <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50'>
-                    <div className='bg-white p-8 rounded-lg shadow-lg flex flex-col items-center'>
-                        <h3 className='text-lg font-bold mb-2'>Link Created!</h3>
-                        <p className='mb-4'>Your new short link:</p>
-                        <a href={createdShortLink} target="_blank" rel="noopener noreferrer" className='text-blue-600 underline break-all'>{createdShortLink}</a>
-                        <Button label='Close' className='mt-4' isPending={false} onClick={() => { setShowModal(false); navigate('/links') }} />
+            {
+                showModal && (
+                    <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50'>
+                        <div className='bg-white p-8 rounded-lg shadow-lg flex flex-col items-center'>
+                            <h3 className='text-lg font-bold mb-2'>Link Created!</h3>
+                            <p className='mb-4'>Your new short link:</p>
+                            <a href={createdShortLink} target="_blank" rel="noopener noreferrer" className='text-blue-600 underline break-all'>{createdShortLink}</a>
+                            <Button label='Close' className='mt-4' isPending={false} onClick={() => { setShowModal(false); navigate('/links') }} />
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
             {/* {error && <div className='text-red-600 mt-4'>{error}</div>} */}
 
-        </section>
+        </section >
     )
 }
 

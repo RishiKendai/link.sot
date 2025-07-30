@@ -75,7 +75,7 @@ const LinkEdit = () => {
 
     // Fetch link data
     const { data: linkData, isLoading: isFetching } = useApiQuery<LinkState>({
-        path: `/api/v1/links/${urlId}`,
+        path: `/links/${urlId}`,
         key: ['link', urlId],
     })
 
@@ -230,59 +230,68 @@ const LinkEdit = () => {
     const setExpiryDate = handleExpiryDateChange as React.Dispatch<React.SetStateAction<Date | undefined>>
 
     return (
-        <section className='polished-card flex flex-col p-8 rounded-md w-full'>
-            <h2 className='text-2xl font-bold text-gray-900 mb-6'>Edit Short Link</h2>
+        <section className='min-h-screen flex flex-col py-8 w-full'>
             <form onSubmit={handleSubmit}>
-                <div className='flex flex-col w-full space-y-7'>
-                    <TextBox
-                        label='Original URL'
-                        name='original_url'
-                        type='url'
-                        placeholder='https://www.example.com'
-                        id='url'
-                        value={link.original_url}
-                        onChange={handleInputChange}
-                        disabled={isFetching || isUpdating}
-                        error={fieldErrors.original_url}
-                    />
-                    {/* Custom back-half */}
-                    <div className='flex flex-col gap-3'>
-                        <Toggle
-                            className='w-[250px]'
-                            label="Custom Back-Half"
-                            enabled={isCustomBackoffEnabled}
-                            onToggle={setIsCustomBackoffEnabled}
-                            disabled={isFetching || isUpdating}
-                        />
-                        <div className='flex items-end gap-2 w-full'>
+                <div className='flex flex-col w-full space-y-7 px-2 md:px-8 max-w-5xl justify-self-center'>
+                    <h2 className='text-2xl font-bold text-gray-900 mb-6'>Edit Short Link</h2>
+                    <div className="group-fields card-group w-full">
+                        <div className='card-item'>
                             <TextBox
-                                // label='Custom Back-Half'
-                                name='custom_backoff'
-                                type='text'
-                                placeholder='custom-back-half'
-                                id='custom-back-half-base'
-                                value={baseURL}
-                                className='text-gray-400'
-                                disabled
-                            />
-                            <span className='text-black leading-6 py-2'>/</span>
-                            <TextBox
-                                name='custom_backoff'
-                                type='text'
-                                placeholder='custom-back-half'
-                                id='custom-back-half'
-                                value={link.custom_backoff}
-                                wrapperClass='w-1/2'
+                                label='Original URL'
+                                name='original_url'
+                                type='url'
+                                placeholder='https://www.example.com'
+                                id='url'
+                                value={link.original_url}
                                 onChange={handleInputChange}
-                                disabled={isFetching || isUpdating || !isCustomBackoffEnabled}
-                                readOnly={!isCustomBackoffEnabled}
-                                error={fieldErrors.custom_backoff}
+                                disabled={isFetching || isUpdating}
+                                error={fieldErrors.original_url}
                             />
                         </div>
+                        {/* Custom back-half */}
+                        <div className="card-item">
+                            <div className='flex flex-col gap-3'>
+                                <Toggle
+                                    className='w-full'
+                                    label="Custom Back-Half"
+                                    enabled={isCustomBackoffEnabled}
+                                    onToggle={setIsCustomBackoffEnabled}
+                                    disabled={isFetching || isUpdating}
+                                />
+                                <div className='flex items-end gap-2 w-full pb-5'>
+                                    <TextBox
+                                        // label='Custom Back-Half'
+                                        name='custom_backoff'
+                                        type='text'
+                                        placeholder='custom-back-half'
+                                        id='custom-back-half-base'
+                                        value={baseURL}
+                                        className='text-gray-400'
+                                        disabled
+                                    />
+                                    <span className='text-black leading-6 py-2'>/</span>
+                                    <TextBox
+                                        name='custom_backoff'
+                                        type='text'
+                                        placeholder='custom-back-half'
+                                        id='custom-back-half'
+                                        value={link.custom_backoff}
+                                        wrapperClass='w-full'
+                                        onChange={handleInputChange}
+                                        disabled={isFetching || isUpdating || !isCustomBackoffEnabled}
+                                        readOnly={!isCustomBackoffEnabled}
+                                        error={fieldErrors.custom_backoff}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    {/* Expiry date, password, and protection */}
-                    <div className='grid grid-cols-2 gap-8'>
-                        <div className='flex flex-col gap-8 relative'>
+                    <h5 className='text-lg font-semibold text-gray-900 mb-4'>Advanced Settings</h5>
+                    <div className="card-group">
+                        <div className="card-item">
+                            {/* Expiry date, password, and protection */}
+                            {/* <div className='grid grid-cols-2 gap-8'> */}
+                            {/* <div className='flex flex-col gap-8 relative'> */}
                             <TextBox
                                 onClick={() => setShowCalendar(true)}
                                 label='Expiry Date (Optional)'
@@ -304,6 +313,43 @@ const LinkEdit = () => {
                                     expiryDate={link.expiry_date}
                                 />
                             )}
+                        </div>
+                        {/* </div> */}
+                        <div className="card-item">
+                            <div className='flex flex-col gap-3'>
+                                <Toggle
+                                    label="Password (Optional)"
+                                    enabled={isPasswordEnabled}
+                                    onToggle={setIsPasswordEnabled}
+                                    disabled={isFetching || isUpdating}
+                                />
+                                <TextBox
+                                    name='password'
+                                    type='text'
+                                    id='password'
+                                    value={link.password}
+                                    onChange={handleInputChange}
+                                    placeholder='Enter password'
+                                    disabled={isFetching || isUpdating || !isPasswordEnabled}
+                                    readOnly={!isPasswordEnabled}
+                                />
+                            </div>
+                        </div>
+                        {/* </div> */}
+                        <div className="card-item">
+                            {/* Tags */}
+                            <ChipInput
+                                label='Tags (Optional)'
+                                name='tags'
+                                placeholder='Add tags...'
+                                initialValues={link.tags}
+                                onValuesChange={handleTagsChange}
+                                disabled={isFetching || isUpdating}
+                                error={fieldErrors.tags}
+                                maxChips={10}
+                            />
+                        </div>
+                        <div className="card-item">
                             <Checkbox
                                 label='Enable Protection (Auto scan for malicious email)'
                                 id='scan-link'
@@ -311,36 +357,7 @@ const LinkEdit = () => {
                                 onChange={handleInputChange}
                             />
                         </div>
-                        <div className='flex flex-col gap-3'>
-                            <Toggle
-                                label="Password (Optional)"
-                                enabled={isPasswordEnabled}
-                                onToggle={setIsPasswordEnabled}
-                                disabled={isFetching || isUpdating}
-                            />
-                            <TextBox
-                                name='password'
-                                type='text'
-                                id='password'
-                                value={link.password}
-                                onChange={handleInputChange}
-                                placeholder='Enter password'
-                                disabled={isFetching || isUpdating || !isPasswordEnabled}
-                                readOnly={!isPasswordEnabled}
-                            />
-                        </div>
                     </div>
-                    {/* Tags */}
-                    <ChipInput
-                        label='Tags (Optional)'
-                        name='tags'
-                        placeholder='Add tags...'
-                        initialValues={link.tags}
-                        onValuesChange={handleTagsChange}
-                        disabled={isFetching || isUpdating}
-                        error={fieldErrors.tags}
-                        maxChips={10}
-                    />
                     {error && <Alert type='danger' message={error} className='mb-4' />}
                     <div className='flex justify-end'>
                         <Button className='mr-6 text-base' label='Cancel' type='button' variant='secondary' disabled={isFetching || isUpdating} onClick={() => navigate('/links')} />
