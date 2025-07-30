@@ -117,3 +117,38 @@ body {
   background: #ffffffcc;
   backdrop-filter: blur(12px) saturate(1.8);
 }
+
+.hr {
+  background-color: var(--clr-border);
+  width: 100%;
+  border-top: 1px solid var(--clr-border);
+  margin-block: 32px;
+}
+
+.hr-down {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.hr-up {
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.card-group {
+  padding-inline: 20px;
+  padding-block: 34px;
+  background-color: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.card-group .card-item:not(:last-child) {
+  @apply border-b border-gray-200; 
+  /* border-bottom: 1px solid var(--clr-border); */
+  padding-bottom: 32px;
+}
+
+.card-group .card-item:not(:first-child) {
+  padding-top: 32px;
+}
