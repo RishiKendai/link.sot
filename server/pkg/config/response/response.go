@@ -3,6 +3,8 @@ package response
 import (
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -42,6 +44,25 @@ func SendAccepted(context *gin.Context, message string, action *string) {
 		"message": message,
 		"action":  action,
 	})
+}
+
+// ServeHTML renders an HTML template with the given status code, template name, and data.
+func ServeHTML(c *gin.Context, status int, name string, obj interface{}) {
+	c.HTML(status, name, obj)
+}
+
+// ServeHTMLFile serves an HTML file from the static directory with the given status code.
+func ServeHTMLFile(c *gin.Context, filename string, status int) {
+	fullPath := filepath.Join("templates", filename)
+	file, err := os.Open(fullPath)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	defer file.Close()
+
+	c.DataFromReader(status, -1, "text/html; charset=utf-8", file, nil)
+
 }
 
 /* ---------------- Error Functions ---------------- */
