@@ -9,5 +9,6 @@ func RegisterRoutes(router *gin.RouterGroup) {
 	routes.Register(router)
 	routes.Auth(router)
 	routes.Links(router)
+	routes.Dashboard(router)
 	routes.Analytics(router)
 }

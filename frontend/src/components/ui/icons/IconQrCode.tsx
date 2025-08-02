@@ -1,13 +1,7 @@
 import React from 'react';
-import { IconBase } from './IconBase';
+import { IconBase, type IconBaseProps } from './IconBase';
 
-interface IconQrCodeProps {
-    size?: number;
-    color?: string;
-    className?: string;
-}
-
-const IconQrCode: React.FC<IconQrCodeProps> = ({ size = 24, color = 'currentColor', className }) => {
+const IconQrCode: React.FC<IconBaseProps> = ({ size = 24, color = 'currentColor', className }) => {
     return (
         <IconBase size={size} color={color} className={className}>
             <path d="M3 3h6v6H3z" />
