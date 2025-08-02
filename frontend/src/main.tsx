@@ -42,7 +42,8 @@ const router = Router([
         children: [
           {
             path: '/dashboard',
-            element: <Dashboard />
+            element: <Dashboard />,
+            errorElement: <ErrorPage />
           },
           {
             path: '/links',
@@ -53,11 +54,16 @@ const router = Router([
               },
               {
                 path: '/links/edit/:id',
-                element: <LinkEdit/>
+                element: <LinkEdit />
               },
               {
                 path: '/links/create',
                 element: <LinkCreate />
+              },
+              {
+                path: '/links/:id/details',
+                element: <LinkDetails />,
+                errorElement: <ErrorPage />
               }
             ]
           },
