@@ -7,21 +7,10 @@ import Searchbar from '../components/ui/inputs/Searchbar';
 import IconLink from '../components/ui/icons/IconLink';
 import { useApiQuery } from '../hooks/useApiQuery';
 import Alert from '../components/ui/Alert';
-import IconCopy from '../components/ui/icons/IconCopy';
-import IconAnalytics from '../components/ui/icons/IconAnalytics';
-import { formatToHumanDate } from '../utils/formateDate';
-import IconEdit from '../components/ui/icons/IconEdit';
-import IconDelete from '../components/ui/icons/IconDelete';
-import IconExpiry from '../components/ui/icons/IconExpiry';
-import IconShield from '../components/ui/icons/IconShield.tsx';
-import IconShieldOff from '../components/ui/icons/IconShieldOff';
-import Tooltip from '../components/ui/Tooltip';
-import IconTick from '../components/ui/icons/IconTick';
-import IconTag from '../components/ui/icons/IconTag';
 import IconChevronLeft from '../components/ui/icons/IconChevronLeft.tsx';
 import IconChevronRight from '../components/ui/icons/IconChevronRight.tsx';
 import clsx from 'clsx'
-import QRCodeGenerator from '../components/QRCodeGenerator';
+import LinkCard from '../components/LinkCard.tsx';
 
 // Import the ExpiryDate type from DatePicker
 // https://www.google.com/s2/favicons?domain=${domain}&sz=${size}
@@ -29,7 +18,6 @@ import QRCodeGenerator from '../components/QRCodeGenerator';
 type Link = {
     user_uid: string;
     uid: string;
-    title: string;
     original_url: string;
     short_link: string;
     tags: string[];
@@ -42,7 +30,6 @@ type Link = {
 }
 
 // const gradientList = ['gpb', 'gct', 'gge', 'gor']
-const baseURL = import.meta.env.VITE_SOT_HOST
 
 const Link: React.FC = () => {
     const [links, setLinks] = useState<Link[]>([])
@@ -141,14 +128,15 @@ const Link: React.FC = () => {
 
                 <div className='flex flex-wrap w-full border-t border-gray-300 pt-12 gap-9'>
                     {/* Loading State */}
-                    {isPending && (
-                        <LinkShimmer count={3} />
-                    )}
+                    {isPending && (<LinkShimmer count={3} />)}
 
                     {/* Data State - Show links if available */}
                     {!isPending && !isError && links && links.length > 0 && (
                         <div className='flex flex-col w-full gap-9'>
-                            <LinkCard links={links} />
+                            {links.map((link) => (
+                                <LinkCard key={link.uid} link={link} />
+                            ))}
+
                             {/* Pagination Controls */}
                             <div className='flex justify-center items-center gap-4 mt-8'>
                                 <button
@@ -220,7 +208,7 @@ const Link: React.FC = () => {
                                     ? 'There was an issue loading your links. Please try refreshing the page.'
                                     : isSearching
                                         ? 'Try a different search term or create a new short link.'
-                                        : "It looks like you haven't created any short links. Use the section above to get started!"}
+                                        : "It looks like you haven't created any short links. Click the button below to get started!"}
                             </p>
                             <Button
                                 label={isError ? 'Try Again' : 'Create Short Link'}
@@ -239,132 +227,6 @@ const Link: React.FC = () => {
 
 export default Link
 
-
-type LinkCardProps = {
-    links: Link[]
-}
-
-const LinkCard = ({ links }: LinkCardProps) => {
-    const navigate = useNavigate()
-    const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null)
-    return (
-        links.map((link) => {
-            const host = new URL(link.original_url).host
-            return (
-                <div key={link.uid} className='relative flex bg-white rounded-2xl border border-[var(--clr-tertiary)]/15 w-full p-6'>
-                    <div>
-                        {/* favIcon */}
-                        <div className="flex items-center gap-2 w-8 h-8 mr-4">
-                            <img src={`https://www.google.com/s2/favicons?sz=64&domain=${host}`} alt="Favicon" className="w-full h-full object-cover" />
-                        </div>
-                    </div>
-                    <div className='w-full'>
-                        <div className="flex mb-8 w-full">
-                            {/* date, title/original_url, short_link */}
-                            <div className="flex flex-col w-full mr-4">
-                                <p className="w-fit text-gray-400 text-sm font-medium mb-1">{formatToHumanDate(link.created_at.toString())}</p>
-                                <p className="w-fit text-[var(--text-primary)] text-lg font-bold truncate">{baseURL}/{link.short_link}</p>
-                                <a href={link.original_url} target="_blank" rel="noopener noreferrer" className="w-fit text-sm truncate text-blue-500 hover:underline hover:text-blue-600 underline-offset-3">{link.title || link.original_url}</a>
-                            </div>
-
-                            {/* menu items */}
-                            <div className="flex items-start gap-2 ml-auto">
-                                {/* Copy */}
-                                <div
-                                    className='flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200 relative group'
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(baseURL + '/' + link.short_link)
-                                        setCopiedLinkId(link.uid)
-                                        setTimeout(() => {
-                                            setCopiedLinkId(null)
-                                        }, 2000)
-                                    }}
-                                >
-                                    {copiedLinkId === link.uid ? (
-                                        <IconTick size={18} />
-                                    ) : (
-                                        <IconCopy size={18} />
-                                    )}
-                                    {/* tooltip */}
-                                    <Tooltip text='Copy' dir='bottom' />
-                                </div>
-                                {/* Edit */}
-                                <div onClick={() => navigate(`/links/edit/${link.short_link}`)} className='flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200 relative group'>
-                                    <IconEdit size={18} />
-                                    <Tooltip text='Edit' dir='bottom' />
-                                </div>
-                                {/* Delete */}
-                                <div className='flex items-center justify-center w-8 h-8 rounded-md hover:bg-red-100 border border-red-200 relative group'>
-                                    <IconDelete size={18} color='red' />
-                                    <Tooltip text='Delete' dir='bottom' />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='flex justify-between items-center'>
-                            <div className='flex flex-wrap items-center gap-4'>
-                                {/* Analytics */}
-                                <div className='flex items-center gap-2 cursor-pointer bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg border border-blue-200 transition-colors' onClick={() => navigate(`/links/analytics/${link.uid}`)}>
-                                    <IconAnalytics size={16} color='blue' />
-                                    <p className='text-blue-700 text-sm font-semibold'>View Analytics</p>
-                                </div>
-                                {/* expiry date */}
-                                <div className='flex items-center gap-1 relative group'>
-                                    <IconExpiry size={18} className='text-gray-400' />
-                                    <p className='text-gray-400 text-sm font-medium'>{formatToHumanDate(link.expiry_date.toString())}</p>
-                                    {/* tooltip */}
-                                    <Tooltip text='Expires on' dir='bottom' />
-                                </div>
-                                {/* is password protected */}
-                                <div className='flex items-center gap-1'>
-                                    {link.password ? (
-                                        <>
-                                            <IconShield size={18} color='green' />
-                                            <p className='text-green-600 text-sm font-medium'>Password Protected</p>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <IconShieldOff size={18} color='gray' />
-                                            <p className='text-gray-500 text-sm font-medium'>Public</p>
-                                        </>
-                                    )}
-                                </div>
-                                {/* tags */}
-                                {
-                                    link.tags && link.tags.length > 0 && (
-                                        <div className='flex items-center'>
-                                            <IconTag size={18} className='mr-1 text-gray-400' />
-                                            <div className='flex items-center gap-1 flex-wrap'>
-                                                {link.tags.slice(0, 3).map((tag, index) => (
-                                                    <span key={index} className='text-gray-400 text-xs font-medium bg-gray-100 px-2 py-1 rounded-md'>
-                                                        #{tag}
-                                                    </span>
-                                                ))}
-                                                {link.tags.length > 3 && (
-                                                    <span className='text-gray-400 text-xs font-medium'>
-                                                        +{link.tags.length - 3} more
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )
-                                }
-                            </div>
-                            <div>
-                                {/* qr code */}
-                                <QRCodeGenerator 
-                                    url={`${baseURL}/r/${link.short_link}?r=qr`}
-                                    size={48}
-                                    className="cursor-pointer hover:opacity-80 transition-opacity"
-                                    isQR={true}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )
-        })
-    )
-}
 
 
 type LinkShimmerProps = {
