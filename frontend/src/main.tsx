@@ -17,6 +17,9 @@ import LinkCreate from './pages/LinkCreate.tsx'
 import LinkEdit from './pages/LinkEdit.tsx'
 import PublicLink from './pages/PublicLink.tsx'
 import PasswordVerification from './pages/PasswordVerification.tsx'
+import LinkDetails from './pages/LinkDetails.tsx'
+import ErrorPage from './pages/ErrorPage.tsx'
+import Settings from './pages/Settings.tsx'
 
 // Protected routes component that includes AuthProvider
 const ProtectedRoutes = () => (
@@ -61,6 +64,9 @@ const router = Router([
           {
             path: '/analytics',
             element: <Analytics />
+          }, {
+            path: '/settings',
+            element: <Settings />
           }
         ]
       }

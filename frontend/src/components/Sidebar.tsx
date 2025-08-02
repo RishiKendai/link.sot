@@ -11,6 +11,7 @@ import IconHamburger from './ui/icons/iconHamburger';
 import './sidebar.css'
 import Tooltip from './ui/Tooltip';
 import { useApiMutation } from '../hooks/useApiMutation';
+import IconSettings from './ui/icons/IconSettings';
 
 // Define the structure for menu items
 interface MenuItem {
@@ -40,6 +41,12 @@ const menuItems: MenuItem[] = [
     icon: <IconAnalytics />,
     link: '/analytics',
   },
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: <IconSettings />,
+    link: '/settings',
+  }
 ];
 
 const getInitials = (name: string) => {
@@ -270,7 +277,7 @@ const Sidebar: React.FC = () => {
                     className={`
                     flex items-center rounded-xl py-2
                     transition-all duration-200 ease-in-out
-                    ${activeItem === item.link ? 'gct text-white shadow-lg' : 'text-gray-800 hover:bg-gray-100 hover:text-gray-900'}
+                    ${activeItem === item.link ? 'bg-[var(--clr-secondary)]/80  text-white' : 'text-gray-800 hover:bg-gray-100 hover:text-gray-900'}
                     ${isSidebarExpanded || isMobileScreen ? 'px-4 space-x-3' : 'justify-center px-1'}
                   `}
                     onClick={() => handleMenuItemClick(item.id)}
