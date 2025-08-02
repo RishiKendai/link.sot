@@ -9,6 +9,7 @@ import ChipInput from '../components/ui/inputs/ChipInput'
 import { useApiMutation } from '../hooks/useApiMutation'
 import { useNavigate } from 'react-router-dom'
 import Alert from '../components/ui/Alert'
+import { useQueryClient } from '@tanstack/react-query'
 
 const LinkCreate = () => {
     const [url, setUrl] = useState('')
@@ -20,10 +21,9 @@ const LinkCreate = () => {
     const [tags, setTags] = useState<string[]>([])
 
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { mutate: createLink } = useApiMutation(['create-link']);
     const [error, setError] = useState('');
-    const [showModal, setShowModal] = useState(false);
-    const [createdShortLink, setCreatedShortLink] = useState('');
 
     // Helper function to format date for display
     const formatExpiryDateForDisplay = (expiryDate: Date | undefined): string => {
@@ -43,7 +43,7 @@ const LinkCreate = () => {
         e.preventDefault();
         setError('');
         createLink({
-            path: '/api/v1/links',
+            path: '/links',
             method: 'POST',
             payload: {
                 original_url: url,
@@ -55,13 +55,9 @@ const LinkCreate = () => {
             },
         }, {
             onSuccess: (res: unknown) => {
-                if (typeof res === 'object' && res !== null && 'status' in res && res.status === 'success' && 'data' in res && res.data && typeof res.data === 'object' && 'short_link' in res.data) {
-                    setCreatedShortLink((res.data as { short_link: string }).short_link);
-                    setShowModal(true);
-                    setTimeout(() => {
-                        setShowModal(false);
-                        navigate('/links');
-                    }, 2500);
+                if (typeof res === 'object' && res !== null && 'status' in res && res.status === 'success' && 'data' in res && res.data && typeof res.data === 'object' && 'short_code' in res.data) {
+                    queryClient.invalidateQueries({ queryKey: ['links'] })
+                    navigate(`/links/${(res.data as { short_code: string }).short_code}/details`, { state: { status: 'CREATED' }, replace: true });
                 } else if (typeof res === 'object' && res !== null && 'message' in res && typeof (res as { message?: unknown }).message === 'string') {
                     setError((res as { message?: string }).message || 'Failed to create link.');
                 } else {
@@ -127,27 +123,27 @@ const LinkCreate = () => {
                     <div className="card-group">
                         <div className="card-item">
                             {/* <div className='grid grid-cols-2 gap-8'> */}
-                            {/* <div className='flex flex-col gap-8 relative'> */}
-                            <TextBox
-                                onClick={() => setShowCalendar(true)}
-                                label='Expiry Date (Optional)'
-                                name='expiry-date'
-                                type='text'
-                                placeholder='DD-MM-YYYY - HH:MM'
-                                id='expiry-date'
-                                value={formatExpiryDateForDisplay(expiryDate)}
-                                readOnly={true}
-                                postfixIcon={<IconCalendar className='text-gray-600' />}
-                            />
-                            {showCalendar && (
-                                <DatePicker
-                                    showCalendar={showCalendar}
-                                    setShowCalendar={setShowCalendar}
-                                    setExpiryDate={setExpiryDate}
-                                    expiryDate={expiryDate}
+                            <div className='flex flex-col gap-8 relative'>
+                                <TextBox
+                                    onClick={() => setShowCalendar(true)}
+                                    label='Expiry Date (Optional)'
+                                    name='expiry-date'
+                                    type='text'
+                                    placeholder='DD-MM-YYYY - HH:MM'
+                                    id='expiry-date'
+                                    value={formatExpiryDateForDisplay(expiryDate)}
+                                    readOnly={true}
+                                    postfixIcon={<IconCalendar className='text-gray-600' />}
                                 />
-                            )}
-                            {/* </div> */}
+                                {showCalendar && (
+                                    <DatePicker
+                                        showCalendar={showCalendar}
+                                        setShowCalendar={setShowCalendar}
+                                        setExpiryDate={setExpiryDate}
+                                        expiryDate={expiryDate}
+                                    />
+                                )}
+                            </div>
                         </div>
                         <div className="card-item">
                             <div className='flex flex-col gap-3'>
@@ -192,21 +188,7 @@ const LinkCreate = () => {
                     </div>
                 </div>
             </form>
-            {
-                showModal && (
-                    <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50'>
-                        <div className='bg-white p-8 rounded-lg shadow-lg flex flex-col items-center'>
-                            <h3 className='text-lg font-bold mb-2'>Link Created!</h3>
-                            <p className='mb-4'>Your new short link:</p>
-                            <a href={createdShortLink} target="_blank" rel="noopener noreferrer" className='text-blue-600 underline break-all'>{createdShortLink}</a>
-                            <Button label='Close' className='mt-4' isPending={false} onClick={() => { setShowModal(false); navigate('/links') }} />
-                        </div>
-                    </div>
-                )
-            }
-            {/* {error && <div className='text-red-600 mt-4'>{error}</div>} */}
-
-        </section >
+        </section>
     )
 }
 

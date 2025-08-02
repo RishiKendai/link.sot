@@ -66,8 +66,6 @@ const LinkEdit = () => {
 
     const [link, setLink] = useState<LinkState>(initialLinkState)
     const [showCalendar, setShowCalendar] = useState(false)
-    const [showModal, setShowModal] = useState(false)
-    const [updatedShortLink, setUpdatedShortLink] = useState('')
     const [error, setError] = useState('')
     const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({})
     const [isCustomBackoffEnabled, setIsCustomBackoffEnabled] = useState(false)
@@ -184,12 +182,12 @@ const LinkEdit = () => {
         e.preventDefault()
         setError('')
         if (!validateAll()) {
-            setError('Please fix the errors before submitting.')
+            setError('Please fill in all required fields.')
             return
         }
         console.log('link', link)
         updateLink({
-            path: `/api/v1/links/${urlId}`,
+            path: `/links/${urlId}`,
             method: 'PUT',
             payload: {
                 original_url: link.original_url,
@@ -202,14 +200,9 @@ const LinkEdit = () => {
         }, {
             onSuccess: (res: unknown) => {
                 if (typeof res === 'object' && res !== null && 'status' in res && res.status === 'success' && 'data' in res && res.data && typeof res.data === 'object' && 'short_link' in res.data) {
-                    setUpdatedShortLink((res.data as { short_link: string }).short_link)
-                    setShowModal(true)
                     // Invalidate and refetch links
                     queryClient.invalidateQueries({ queryKey: ['links'] })
-                    setTimeout(() => {
-                        setShowModal(false)
-                        navigate('/links')
-                    }, 2500)
+                    navigate(`/links/${link.short_link}/details`, { state: { status: 'UPDATED', replace: true } })
                 } else if (typeof res === 'object' && res !== null && 'message' in res && typeof (res as { message?: unknown }).message === 'string') {
                     setError((res as { message?: string }).message || 'Failed to update link.')
                 } else {
@@ -291,30 +284,30 @@ const LinkEdit = () => {
                         <div className="card-item">
                             {/* Expiry date, password, and protection */}
                             {/* <div className='grid grid-cols-2 gap-8'> */}
-                            {/* <div className='flex flex-col gap-8 relative'> */}
-                            <TextBox
-                                onClick={() => setShowCalendar(true)}
-                                label='Expiry Date (Optional)'
-                                name='expiry_date'
-                                type='text'
-                                placeholder='DD-MM-YYYY - HH:MM'
-                                id='expiry-date'
-                                value={formatExpiryDateForDisplay(link.expiry_date)}
-                                readOnly={true}
-                                postfixIcon={<IconCalendar className='text-gray-600' />}
-                                disabled={isFetching || isUpdating}
-                                error={fieldErrors.expiry_date}
-                            />
-                            {showCalendar && (
-                                <DatePicker
-                                    showCalendar={showCalendar}
-                                    setShowCalendar={setShowCalendar}
-                                    setExpiryDate={setExpiryDate}
-                                    expiryDate={link.expiry_date}
+                            <div className='flex flex-col gap-8 relative'>
+                                <TextBox
+                                    onClick={() => setShowCalendar(true)}
+                                    label='Expiry Date (Optional)'
+                                    name='expiry_date'
+                                    type='text'
+                                    placeholder='DD-MM-YYYY - HH:MM'
+                                    id='expiry-date'
+                                    value={formatExpiryDateForDisplay(link.expiry_date)}
+                                    readOnly={true}
+                                    postfixIcon={<IconCalendar className='text-gray-600' />}
+                                    disabled={isFetching || isUpdating}
+                                    error={fieldErrors.expiry_date}
                                 />
-                            )}
+                                {showCalendar && (
+                                    <DatePicker
+                                        showCalendar={showCalendar}
+                                        setShowCalendar={setShowCalendar}
+                                        setExpiryDate={setExpiryDate}
+                                        expiryDate={link.expiry_date}
+                                    />
+                                )}
+                            </div>
                         </div>
-                        {/* </div> */}
                         <div className="card-item">
                             <div className='flex flex-col gap-3'>
                                 <Toggle
@@ -365,17 +358,6 @@ const LinkEdit = () => {
                     </div>
                 </div>
             </form>
-            {/* Modal for updated short link */}
-            {showModal && (
-                <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50'>
-                    <div className='bg-white p-8 rounded-lg shadow-lg flex flex-col items-center'>
-                        <h3 className='text-lg font-bold mb-2'>Link Updated!</h3>
-                        <p className='mb-4'>Your new short link:</p>
-                        <a href={updatedShortLink} target="_blank" rel="noopener noreferrer" className='text-blue-600 underline break-all'>{updatedShortLink}</a>
-                        <Button label='Close' className='mt-4' isPending={false} onClick={() => { setShowModal(false); navigate('/links') }} />
-                    </div>
-                </div>
-            )}
         </section>
     )
 }
