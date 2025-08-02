@@ -3,23 +3,27 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter as Router, RouterProvider } from 'react-router-dom'
 
-import App from './pages/App.tsx'
 import Layout from './Layout.tsx'
 
 import { AuthProvider } from './context/AuthContext.tsx'
 import './global.css'
 import ProtectedLayout from './context/ProtectedLayout.tsx'
-import Dashboard from './pages/Dashboard.tsx'
+import lazyLoad from './lazyLoad.ts'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import Link from './pages/Link.tsx'
-import Analytics from './pages/Analytics.tsx'
-import LinkCreate from './pages/LinkCreate.tsx'
-import LinkEdit from './pages/LinkEdit.tsx'
-import PublicLink from './pages/PublicLink.tsx'
-import PasswordVerification from './pages/PasswordVerification.tsx'
-import LinkDetails from './pages/LinkDetails.tsx'
-import ErrorPage from './pages/ErrorPage.tsx'
-import Settings from './pages/Settings.tsx'
+
+const App = lazyLoad(() => import('./pages/App.tsx'))
+const Dashboard = lazyLoad(() => import('./pages/Dashboard.tsx'))
+const Link = lazyLoad(() => import('./pages/Link.tsx'))
+const Analytics = lazyLoad(() => import('./pages/Analytics.tsx'))
+const LinkCreate = lazyLoad(() => import('./pages/LinkCreate.tsx'))
+const LinkEdit = lazyLoad(() => import('./pages/LinkEdit.tsx'))
+const PublicLink = lazyLoad(() => import('./pages/PublicLink.tsx'))
+const PasswordVerification = lazyLoad(() => import('./pages/PasswordVerification.tsx'))
+const LinkDetails = lazyLoad(() => import('./pages/LinkDetails.tsx'))
+const ErrorPage = lazyLoad(() => import('./pages/ErrorPage.tsx'))
+const Settings = lazyLoad(() => import('./pages/Settings.tsx'))
+
+
 
 // Protected routes component that includes AuthProvider
 const ProtectedRoutes = () => (
