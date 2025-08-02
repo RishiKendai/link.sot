@@ -29,6 +29,7 @@ type Link struct {
 	Is_custom_backoff bool      `json:"is_custom_backoff"`
 	Updated_at        time.Time `json:"updated_at"`
 	Tags              []string  `json:"tags"`
+	Deleted           bool      `json:"deleted"`
 }
 
 type PreviewData struct {
