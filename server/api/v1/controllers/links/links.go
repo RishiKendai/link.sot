@@ -115,7 +115,6 @@ func CheckAliasAvailabilityHandler() gin.HandlerFunc {
 
 func RedirectHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println("RedirectHandler >>>>>>>>>>>>>>>>>>>: ")
 		sot := c.Param("sot") // or "short" depending on your route
 		if sot == "" {
 			response.SendBadRequestError(c, "Short link not provided", nil)
@@ -129,13 +128,13 @@ func RedirectHandler() gin.HandlerFunc {
 		var tagsJSON []byte
 		sqlRow, err := postgres.FindOne("SELECT * FROM links WHERE short_link = $1", sot)
 		if err != nil {
-			fmt.Println("Error: >>>>>>>>>>>", err)
+			fmt.Println("Error:", err)
 			response.SendServerError(c, err, nil)
 			return
 		}
 		err = sqlRow.Scan(&link.User_uid, &link.Uid, &link.Original_url, &link.Short_link, &link.Is_custom_backoff, &link.Created_at, &link.Expiry_date, &link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at, &tagsJSON, &link.Deleted)
 		if err != nil {
-			fmt.Println("Error not found: >>>>>>>>>>>", err)
+			fmt.Println("Error not found: ", err)
 			if err == sql.ErrNoRows {
 				response.ServeHTMLFile(c, "link_not_found.html", 404)
 				return
