@@ -1,3 +1,6 @@
+@import "tailwindcss";
+@tailwind utilities;
+
 .db-layout-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
@@ -5,17 +8,15 @@
     margin-bottom: 42px;
 }
 
-.db-layout--main {
-    /* display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(1fr, 1fr));
-    gap: 24px; */
-    display: flex;
+@layer {
+    .db-layout--main {
+        @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+    }
 }
 
 .db-layout--main-right,
 .db-layout--main-left {
     width: 100%;
-    border-radius: 24px;
 }
 
 .db-layout--main-left {

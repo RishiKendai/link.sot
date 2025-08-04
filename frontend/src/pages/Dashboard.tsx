@@ -101,7 +101,7 @@ const Dashboard: React.FC = () => {
       <div className='flex items-center justify-between mb-10'>
         <div>
           <h5 className='text-5xl font-black mb-4'>Dashboard</h5>
-          <p className='text-gray-600 tex-xl'>Welcome back <span className='dynamic-txt-gradient gct font-extrabold italic'>{user?.name}</span></p>
+          {user?.name && <p className='text-gray-600 tex-xl'>Welcome back <span className='dynamic-txt-gradient gct font-extrabold italic'>{user?.name}</span></p>}
         </div>
         <Button label='Create Link' className='gpb' onClick={() => navigate('/links/create')} isPending={false} />
       </div>
