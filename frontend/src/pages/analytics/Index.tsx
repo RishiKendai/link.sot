@@ -96,7 +96,7 @@ console.log('daily weekly monthly', data.data.analytics_stats.daily_stats, data.
             </div>
             <div className="analytics-layout mb-8">
                 <ChartLayout label='Browser Chart' children={<BrowserChart browserStats={analytics.analytics_stats.browser_stats} />} />
-                <ChartLayout  label='World Map Chart' children={<WorldMapChart geographicData={analytics.analytics_stats.geographic_data} />} />
+                <ChartLayout  label='Country Click HeatMap' children={<WorldMapChart geographicData={analytics.analytics_stats.geographic_data} />} />
             </div>
         </div>
     );

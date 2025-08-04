@@ -1,9 +1,10 @@
-import React from 'react';
-import WorldMap from 'react-svg-worldmap';
+import React from "react";
+import { VectorMap } from "@react-jvectormap/core";
+import { worldMill } from "@react-jvectormap/world";
 
 interface GeographicData {
   country: string;
-  country_code: string;
+  country_code: string; // e.g., "US", "IN"
   click_count: number;
 }
 
@@ -12,61 +13,52 @@ interface WorldMapChartProps {
 }
 
 const WorldMapChart: React.FC<WorldMapChartProps> = ({ geographicData }) => {
-  // Convert geographic data to the format expected by react-svg-worldmap
-  const data = geographicData.map(item => ({
-    country: item.country_code,
-    value: item.click_count
-  }));
+  // Convert to key-value format for region coloring
+  const regionValues: Record<string, number> = {};
+  geographicData.forEach((item) => {
+    regionValues[item.country_code.toUpperCase()] = item.click_count;
+  });
+
+  // Calculate max value for color scaling
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold mb-4">Geographic Click Distribution</h3>
-      <div className="relative">
-        <div className="w-full h-96">
-          <WorldMap
-            data={data}
-            size="responsive"
-          />
-        </div>
+    <div className="bg-white rounded-xl border border-gray-200 p-6 w-full">
+      <div className="w-full h-[400px]">
+        <VectorMap
+          map={worldMill}
+          backgroundColor="transparent"
+          regionStyle={{
+            initial: {
+              fill: "#f3f4f6", 
+              fillOpacity: 1,
+              stroke: "#ffffff",
+              strokeWidth: 0.5,
+            },
+          }}
+          series={{
+            regions: [
+              {
+                attribute: "fill",
+                values: regionValues,
+                scale: ["#dbeafe", "#1e3a8a"],
+                normalizeFunction: "linear",
+              },
+            ],
+          }}
+        />
+      </div>
 
-        {/* Legend */}
-        <div className="mt-4 flex items-center justify-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-gray-200 rounded"></div>
-            <span className="text-sm text-gray-600">No clicks</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-blue-200 rounded"></div>
-            <span className="text-sm text-gray-600">Low</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-blue-400 rounded"></div>
-            <span className="text-sm text-gray-600">Medium</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-blue-600 rounded"></div>
-            <span className="text-sm text-gray-600">High</span>
-          </div>
-        </div>
-
-        {/* Top Countries List */}
-        <div className="mt-6">
-          <h4 className="text-md font-medium mb-3">Top Countries</h4>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {geographicData
-              .sort((a, b) => b.click_count - a.click_count)
-              .slice(0, 6)
-              .map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-sm font-medium">{item.country}</span>
-                  <span className="text-sm text-blue-600 font-bold">{item.click_count}</span>
-                </div>
-              ))}
-          </div>
+      {/* Legend */}
+      <div className="mt-4 w-full max-w-md mx-auto">
+        <div className="relative h-4 rounded w-full bg-gradient-to-r from-[#dbeafe] via-[#60a5fa] to-[#1e3a8a]" />
+        <div className="flex justify-between text-sm text-gray-600 mt-1">
+          <span>Low</span>
+          <span>Medium</span>
+          <span>High</span>
         </div>
       </div>
     </div>
   );
 };
 
-export default WorldMapChart; 
+export default WorldMapChart;
