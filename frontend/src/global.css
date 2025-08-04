@@ -31,11 +31,12 @@
   /* --clr-border: #CBD5E1; */
   --clr-border: #D6E7F2;
   --ice-blue: #D6EAF3;
-  --empty-bg: #e8f0f8;
-
+  --ice-silver: #EAF4F9;
+   --empty-bg: #e8f0f8;
+  /* --bg-secondary: #F3F6FA; */
+  --bg-secondary: #F0F4F8;
 
   --loader-color: var(--clr-primary);
-
   --gradient-purple-blue: linear-gradient(135deg, #7F00FF 0%, #E100FF 100%);
   --gradient-cyan-teal: linear-gradient(135deg, #00C6FB 0%, #005BEA 100%);
   --gradient-green-emerald: linear-gradient(135deg, #38EF7D 0%, #11998E 100%);
@@ -45,6 +46,35 @@
   --gradient-indigo-navy: linear-gradient(135deg, #4B0082 0%, #000080 100%);
   --gradient-space-black-blue: linear-gradient(135deg, #0D0F1C 0%, #0A1E40 100%);
 }
+
+/* Mobile devices */
+@media screen and (max-width: 600px) {
+  :root {
+    font-size: 14px;
+  }
+}
+
+/* Tablet */
+@media screen and (min-width: 601px) and (max-width: 1024px) {
+  :root {
+    font-size: 16px;
+  }
+}
+
+/* Laptop */
+@media screen and (min-width: 1025px) and (max-width: 1440px) {
+  :root {
+    font-size: 16px;
+  }
+}
+
+/* larger than Laptop */
+@media screen and (min-width: 1441px) {
+  :root {
+    font-size: 18px;
+  }
+}
+
 
 html, body {
   padding: 0;
@@ -69,7 +99,7 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-.txt-2{
+.txt-2 {
   color: var(--text-secondary);
 }
 
