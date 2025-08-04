@@ -1,0 +1,14 @@
+.link__card-left {
+
+    border-bottom: 1px solid var(--clr-border);
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+}
+
+@media screen and (min-width: 768px) {
+    .link__card-left {
+        border-bottom: 0;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+}
