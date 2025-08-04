@@ -124,18 +124,6 @@ func RedirectHandler() gin.HandlerFunc {
 		isQR := c.Query("r") == "qr"
 		ua := c.Request.UserAgent()
 		ip := getClientIP(c)
-		country := c.Request.Header.Get("CF-IPCountry")
-		deviceType := c.Request.Header.Get("CF-Device-Type")
-		browser := c.Request.Header.Get("CF-UA-Browser")
-		os := c.Request.Header.Get("CF-UA-OS")
-		ipAddress := c.Request.Header.Get("CF-Connecting-IP")
-		fmt.Println("--------------------------------")
-		fmt.Println("Country: ", country)
-		fmt.Println("Device Type: ", deviceType)
-		fmt.Println("Browser: ", browser)
-		fmt.Println("OS: ", os)
-		fmt.Println("IP Address: ", ipAddress, " ", ip)
-		fmt.Println("--------------------------------")
 		// Get link details from database
 		var link Link
 		var tagsJSON []byte

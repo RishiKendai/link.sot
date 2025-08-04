@@ -25,10 +25,11 @@ func CheckPasswordHash(password, hash string) bool {
 var jwtSecret = []byte(env.GetEnvKey("JWT_SECRET"))
 
 // Generate JWT token
-func GenerateJWT(uid, email string) (string, error) {
+func GenerateJWT(uid, email, name string) (string, error) {
 	claims := jwt.MapClaims{
 		"uid":   uid,
 		"email": email,
+		"name":  name,
 		// "exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -64,8 +65,9 @@ func Authenticate() gin.HandlerFunc {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("uid", claims["uid"].(string))
 			c.Set("email", claims["email"].(string))
+			c.Set("name", claims["name"].(string))
 			c.SetSameSite(http.SameSiteLaxMode)
-			c.SetCookie("token", token.Raw, 60*60*24, "/", "localhost", false, true)
+			c.SetCookie("token", token.Raw, 60*60*24, "/", "", false, true)
 			c.Next()
 			return
 		}
