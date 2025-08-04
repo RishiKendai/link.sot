@@ -57,7 +57,7 @@ const BrowserChart: React.FC<BrowserChartProps> = ({ browserStats }) => {
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function(context: import('chart.js').TooltipItem<'doughnut'>) {
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
             const percentage = ((context.parsed / total) * 100).toFixed(1);
             return `${context.label}: ${context.parsed} (${percentage}%)`;
@@ -68,7 +68,7 @@ const BrowserChart: React.FC<BrowserChartProps> = ({ browserStats }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="bg-white rounded-xl border border-gray-200 p-6 w-full">
       <h3 className="text-lg font-semibold mb-4">Browser Distribution</h3>
       <div className="h-64">
         <Doughnut data={data} options={options} />

@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+.analytics__card-y {
+    max-height: 425px;
+    overflow-y: auto;
+    /* padding-right: 16px; */
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--clr-border);
+        border-radius: 8px;
+    }
+}
+
+@layer {
+    .analytics-layout {
+        @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+    }
+}

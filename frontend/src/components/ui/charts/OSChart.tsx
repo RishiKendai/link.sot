@@ -59,13 +59,16 @@ const OSChart: React.FC<OSChartProps> = ({ osStats }) => {
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
-            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-            const percentage = ((context.parsed / total) * 100).toFixed(1);
-            return `${context.label}: ${context.parsed} (${percentage}%)`;
+          label: function (context: import('chart.js').TooltipItem<'bar'>) {
+            const dataset = context.dataset.data as number[];
+            const total = dataset.reduce((a, b) => a + b, 0);
+
+            const value = context.parsed.y ?? 0;
+            const percentage = ((value / total) * 100).toFixed(1);
+            return `${context.label}: ${value} (${percentage}%)`;
           },
         },
-      },
+      }
     },
     scales: {
       y: {
@@ -89,8 +92,8 @@ const OSChart: React.FC<OSChartProps> = ({ osStats }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold mb-4">Operating System Distribution</h3>
+    <div className="bg-white rounded-xl border border-gray-200 p-6 w-full">
+      <h3 className="text-lg font-semibold mb-4">Platform Distribution</h3>
       <div className="h-64">
         <Bar data={data} options={options} />
       </div>

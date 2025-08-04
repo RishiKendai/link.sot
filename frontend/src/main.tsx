@@ -14,7 +14,7 @@ import lazyLoad from './lazyLoad.ts'
 const App = lazyLoad(() => import('./pages/App.tsx'))
 const Dashboard = lazyLoad(() => import('./pages/Dashboard.tsx'))
 const Link = lazyLoad(() => import('./pages/Link.tsx'))
-const Analytics = lazyLoad(() => import('./pages/Analytics.tsx'))
+const Analytics = lazyLoad(() => import('./pages/analytics/Index.tsx'))
 const LinkCreate = lazyLoad(() => import('./pages/LinkCreate.tsx'))
 const LinkEdit = lazyLoad(() => import('./pages/LinkEdit.tsx'))
 const PublicLink = lazyLoad(() => import('./pages/PublicLink.tsx'))
@@ -73,7 +73,8 @@ const router = Router([
           },
           {
             path: '/analytics',
-            element: <Analytics />
+            element: <Analytics />,
+            // errorElement: <ErrorPage />
           }, {
             path: '/settings',
             element: <Settings />

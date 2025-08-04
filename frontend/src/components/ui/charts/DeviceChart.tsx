@@ -56,7 +56,7 @@ const DeviceChart: React.FC<DeviceChartProps> = ({ deviceStats }) => {
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function(context: import('chart.js').TooltipItem<'pie'>) {
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
             const percentage = ((context.parsed / total) * 100).toFixed(1);
             return `${context.label}: ${context.parsed} (${percentage}%)`;
@@ -67,7 +67,7 @@ const DeviceChart: React.FC<DeviceChartProps> = ({ deviceStats }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="bg-white rounded-xl border border-gray-200 p-6 w-full">
       <h3 className="text-lg font-semibold mb-4">Device Distribution</h3>
       <div className="h-64">
         <Pie data={data} options={options} />
