@@ -16,7 +16,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/RishiKendai/sot/pkg/database/postgres"
-	"github.com/RishiKendai/sot/pkg/services"
 )
 
 func CheckURLSafety(rawURL string) (bool, string) {
@@ -72,11 +71,6 @@ func isResponsiveURL(targetURL string) bool {
 
 	// Accept 200–399 as safe
 	return resp.StatusCode >= 200 && resp.StatusCode < 400
-}
-
-func PushAnalytics(shortURL string, ip string, userAgent string, isQR bool) error {
-	referrer := "" // You can extract this from the request if needed
-	return services.PushAnalytics(shortURL, ip, userAgent, isQR, referrer)
 }
 
 func IsValidURL(sot string) bool {
