@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useApiQuery } from '../../hooks/useApiQuery';
 import clsx from 'clsx';
+// import IconAnalytics from '../../components/ui/icons/IconAnalytics';
+// import IconLink from '../../components/ui/icons/IconLink';
+// import IconQrCode from '../../components/ui/icons/IconQrCode';
+// import { DeviceChart, OSChart, TimeChart, CountryChart, BrowserChart, WeeklyChart, WorldMapChart } from '../../components/ui/charts';
 
 import './Shimmer'
 import type { AnalyticsType } from './types';
