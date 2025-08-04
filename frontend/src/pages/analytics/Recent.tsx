@@ -34,8 +34,7 @@ const Card: React.FC<{ data: RecentActivityType }> = ({ data }) => {
         <h4 className='text-lg font-semibold truncate'>{data.short_link}</h4>
         <p className='text-xs txt-2 truncate'>{data.original_link}</p>
       </div>
-      {/* <div className="my-4 border-t border-t-[var(--clr-border)] w-full h-[1px]"></div> */}
-      <div className='flex items-center space-x-4 flex-wrap bg-[var(--ice-silver)] p-2 rounded-md'>
+      <div className='flex items-center flex-wrap gap-4 bg-[var(--ice-silver)] p-2 rounded-md'>
         <div className='flex items-center'>
           <IconMapPin className='mr-1' size={18} />
           <span className='text-xs'>{data.location}</span>
