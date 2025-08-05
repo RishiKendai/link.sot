@@ -191,8 +191,8 @@ const StatsCard: React.FC<StatsProps> = ({ Icon, title, value, iconClass }) => {
             <span className={clsx('mr-4 p-2 rounded-2xl text-white flex items-center justify-center', iconClass)}>
                 <Icon size={32} />
             </span>
-            <div className='flex flex-col justify-center'>
-                <h5 className='text-lg font-bold'>{value}</h5>
+            <div className='flex flex-col justify-center min-w-0'>
+                <h5 className='w-fit max-w-full truncate text-lg font-bold'>{value}</h5>
                 <p className='txt-2 text-sm'>{title}</p>
             </div>
         </div>
