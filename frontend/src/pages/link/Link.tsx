@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 
 import './link.css'
-import Button from '../components/ui/button/Button';
+import Button from '../../components/ui/button/Button.tsx';
 import { useNavigate } from 'react-router-dom';
-import Searchbar from '../components/ui/inputs/Searchbar';
-import IconLink from '../components/ui/icons/IconLink';
-import { useApiQuery } from '../hooks/useApiQuery';
-import Alert from '../components/ui/Alert';
-import IconChevronLeft from '../components/ui/icons/IconChevronLeft.tsx';
-import IconChevronRight from '../components/ui/icons/IconChevronRight.tsx';
+import Searchbar from '../../components/ui/inputs/Searchbar.tsx';
+import IconLink from '../../components/ui/icons/IconLink.tsx';
+import { useApiQuery } from '../../hooks/useApiQuery.ts';
+import Alert from '../../components/ui/Alert.tsx';
+import IconChevronLeft from '../../components/ui/icons/IconChevronLeft.tsx';
+import IconChevronRight from '../../components/ui/icons/IconChevronRight.tsx';
 import clsx from 'clsx'
-import LinkCard from '../components/LinkCard.tsx';
+import LinkCard from '../../components/LinkCard.tsx';
 
 // Import the ExpiryDate type from DatePicker
 // https://www.google.com/s2/favicons?domain=${domain}&sz=${size}

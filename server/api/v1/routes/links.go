@@ -15,6 +15,7 @@ func Links(router *gin.RouterGroup) {
 	router.GET("/links/availability/:alias", services.Authenticate(), links.CheckAliasAvailabilityHandler())
 	router.GET("/links/preview/:url", services.Authenticate(), links.PreviewHandler())
 	router.GET("/links/search", services.Authenticate(), links.SearchLinksHandler())
+	router.GET("/links/analytics/:uid", services.Authenticate(), links.GetLinkAnalyticsHandler())
 }
 
 // RegisterPublicRoutes registers public short link handlers on the root router (no prefix)

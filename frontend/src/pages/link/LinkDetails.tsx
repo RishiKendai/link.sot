@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useApiQuery } from '../hooks/useApiQuery';
-import IconChevronLeft from '../components/ui/icons/IconChevronLeft';
-import Alert from '../components/ui/Alert';
-import LinkCard from '../components/LinkCard';
+import { useApiQuery } from '../../hooks/useApiQuery';
+import IconChevronLeft from '../../components/ui/icons/IconChevronLeft';
+import Alert from '../../components/ui/Alert';
+import LinkCard from '../../components/LinkCard';
 
 type Link = {
     user_uid: string;

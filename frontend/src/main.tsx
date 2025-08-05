@@ -9,17 +9,18 @@ import { AuthProvider } from './context/AuthContext.tsx'
 import './global.css'
 import ProtectedLayout from './context/ProtectedLayout.tsx'
 import lazyLoad from './lazyLoad.ts'
+import LinkAnalytics from './pages/link/LinkAnalytics.tsx'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const App = lazyLoad(() => import('./pages/App.tsx'))
 const Dashboard = lazyLoad(() => import('./pages/Dashboard.tsx'))
-const Link = lazyLoad(() => import('./pages/Link.tsx'))
+const Link = lazyLoad(() => import('./pages/link/Link.tsx'))
 const Analytics = lazyLoad(() => import('./pages/analytics/Index.tsx'))
-const LinkCreate = lazyLoad(() => import('./pages/LinkCreate.tsx'))
-const LinkEdit = lazyLoad(() => import('./pages/LinkEdit.tsx'))
+const LinkCreate = lazyLoad(() => import('./pages/link/LinkCreate.tsx'))
+const LinkEdit = lazyLoad(() => import('./pages/link/LinkEdit.tsx'))
 const PublicLink = lazyLoad(() => import('./pages/PublicLink.tsx'))
 const PasswordVerification = lazyLoad(() => import('./pages/PasswordVerification.tsx'))
-const LinkDetails = lazyLoad(() => import('./pages/LinkDetails.tsx'))
+const LinkDetails = lazyLoad(() => import('./pages/link/LinkDetails.tsx'))
 const ErrorPage = lazyLoad(() => import('./pages/ErrorPage.tsx'))
 const Settings = lazyLoad(() => import('./pages/Settings.tsx'))
 
@@ -68,6 +69,10 @@ const router = Router([
                 path: '/links/:id/details',
                 element: <LinkDetails />,
                 errorElement: <ErrorPage />
+              },
+              {
+                path: '/links/analytics/:id',
+                element: <LinkAnalytics />
               }
             ]
           },
@@ -98,9 +103,9 @@ const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      {/* <ReactQueryDevtools /> */}
-    </QueryClientProvider>
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+    {/* <ReactQueryDevtools /> */}
+  </QueryClientProvider>
   //  </StrictMode>,
 )

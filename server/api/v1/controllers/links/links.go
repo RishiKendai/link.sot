@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/RishiKendai/sot/pkg/config/env"
@@ -645,28 +644,52 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 	}
 }
 
-// Utility to get real client IP from common proxy headers
-func getClientIP(c *gin.Context) string {
-	headers := []string{
-		"CF-Connecting-IP", // Cloudflare
-		"True-Client-IP",   // Akamai & others
-		"X-Forwarded-For",  // Standard proxy header (can contain multiple IPs)
-		"X-Real-IP",        // Nginx or other proxies
-		"X-Client-IP",      // Less common
-	}
-	for _, h := range headers {
-		ip := c.Request.Header.Get(h)
-		fmt.Println("ip: >>>>>>>>>>>> ", ip)
-		if ip != "" {
-			// X-Forwarded-For can be a comma-separated list; take the first
-			if h == "X-Forwarded-For" {
-				if commaIdx := strings.Index(ip, ","); commaIdx != -1 {
-					ip = ip[:commaIdx]
-				}
-				ip = strings.TrimSpace(ip)
-			}
-			return ip
+func GetLinkAnalyticsHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		shortLink := c.Param("uid")
+		var sc struct {
+			ShortLink           string
+			OriginalLink        string
+			Deleted             bool
+			CreatedOn           time.Time
+			ExpiriesOn          time.Time
+			IsPasswordProtected bool
+			Password            *string
 		}
+
+		if shortLink == "" {
+			response.SendBadRequestError(c, "Invalid request body", nil)
+			return
+		}
+		// Get short_link from links table and check if it is deleted
+		sqlRow, err := postgres.FindOne("SELECT short_link, original_link, expiry_date, password, deleted, created_at  FROM links WHERE uid = $1", shortLink)
+		if err != nil {
+			response.SendServerError(c, err, nil)
+			return
+		}
+		err = sqlRow.Scan(&sc.ShortLink, &sc.OriginalLink, &sc.ExpiriesOn, &sc.Password, &sc.Deleted, &sc.CreatedOn)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				response.SendNotFoundError(c, "Link not found", nil)
+				return
+			}
+			response.SendServerError(c, err, nil)
+			return
+		}
+		if sc.Deleted {
+			response.SendStatus(c, http.StatusGone)
+			return
+		}
+		// if not get analytics from analytics table
+		analytics := fetchLinkAnalytics(sc.ShortLink)
+		analytics.CreatedOn = sc.CreatedOn
+		analytics.OriginalURL = sc.OriginalLink
+		if sc.Password != nil {
+			analytics.IsPasswordProtected = true
+		} else {
+			analytics.IsPasswordProtected = false
+		}
+		analytics.ExpiriesOn = sc.ExpiriesOn
+		response.SendJSON(c, analytics, nil)
 	}
-	return c.ClientIP()
 }

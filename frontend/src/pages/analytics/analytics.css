@@ -21,3 +21,10 @@
         @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
     }
 }
+
+.db-layout-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+    gap: 24px;
+    margin-bottom: 42px;
+}

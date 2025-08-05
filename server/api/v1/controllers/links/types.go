@@ -46,3 +46,33 @@ type PaginatedLinksResponse struct {
 	Page     int    `json:"page"`
 	PageSize int    `json:"page_size"`
 }
+
+type LinkAnalytics struct {
+	ShortLink           string           `json:"short_link"`
+	OriginalURL         string           `json:"original_link"`
+	TotalClicks         int              `json:"total_clicks"`
+	UniqueVisitors      int              `json:"unique_visitors"`
+	DirectClicks        int              `json:"direct_clicks"`
+	QR_clicks           int              `json:"qr_clicks"`
+	CreatedOn           time.Time        `json:"created_on"`
+	ExpiriesOn          time.Time        `json:"expiries_on"`
+	IsPasswordProtected bool             `json:"is_password_protected"`
+	LastClickedAt       time.Time        `json:"last_clicked_at"`
+	LastClickBrowser    string           `json:"last_click_browser"`
+	LastClickDevice     string           `json:"last_click_device"`
+	LastClickFrom       string           `json:"last_click_from"`
+	HourlyStats         map[int]int64    `json:"hourly_stats"`
+	DailyStats          map[string]int64 `json:"daily_stats"`
+	WeeklyStats         map[int]int64    `json:"weekly_stats"`
+	MonthlyStats        map[string]int64 `json:"monthly_stats"`
+	OSStats             map[string]int64 `json:"os_stats"`
+	DeviceStats         map[string]int64 `json:"device_stats"`
+	BrowserStats        map[string]int64 `json:"browser_stats"`
+	GeographicData      []GeographicData `json:"geographic_data"`
+}
+
+type GeographicData struct {
+	Country     string `json:"country"`
+	CountryCode string `json:"country_code"`
+	ClickCount  int64  `json:"click_count"`
+}
