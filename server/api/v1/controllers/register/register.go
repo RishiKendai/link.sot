@@ -85,7 +85,7 @@ func Register() gin.HandlerFunc {
 			response.SendServerError(c, err, nil)
 			return
 		}
-		token, err := services.GenerateJWT(id, user.Email)
+		token, err := services.GenerateJWT(id, user.Email, user.Name)
 		if err != nil {
 			log.Println("Register controller:: ", err)
 			response.SendServerError(c, err, nil)
