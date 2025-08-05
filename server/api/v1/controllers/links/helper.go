@@ -16,6 +16,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/RishiKendai/sot/pkg/database/postgres"
+	"github.com/gin-gonic/gin"
 )
 
 func CheckURLSafety(rawURL string) (bool, string) {
@@ -229,4 +230,29 @@ func verifyToken(token string, shortCode string) (bool, error) {
 	fmt.Println("Sig: ", sig)
 
 	return hmac.Equal(sig, expectedSig), nil
+}
+
+// Utility to get real client IP from common proxy headers
+func getClientIP(c *gin.Context) string {
+	headers := []string{
+		"CF-Connecting-IP", // Cloudflare
+		"True-Client-IP",   // Akamai & others
+		"X-Forwarded-For",  // Standard proxy header (can contain multiple IPs)
+		"X-Real-IP",        // Nginx or other proxies
+		"X-Client-IP",      // Less common
+	}
+	for _, h := range headers {
+		ip := c.Request.Header.Get(h)
+		if ip != "" {
+			// X-Forwarded-For can be a comma-separated list; take the first
+			if h == "X-Forwarded-For" {
+				if commaIdx := strings.Index(ip, ","); commaIdx != -1 {
+					ip = ip[:commaIdx]
+				}
+				ip = strings.TrimSpace(ip)
+			}
+			return ip
+		}
+	}
+	return c.ClientIP()
 }

@@ -139,7 +139,9 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 			var count int64
 			err := r.Scan(&hour, &count)
 			if err != nil {
+				mu.Lock()
 				*errs = append(*errs, err)
+				mu.Unlock()
 				continue
 			}
 			hourlyStats[hour] = count
@@ -171,7 +173,9 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 			var count int64
 			err := r.Scan(&date, &count)
 			if err != nil {
+				mu.Lock()
 				*errs = append(*errs, err)
+				mu.Unlock()
 				continue
 			}
 			dailyStats[date.Format("2006-01-02")] = count
@@ -203,7 +207,9 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 			var count int64
 			err := r.Scan(&day, &count)
 			if err != nil {
+				mu.Lock()
 				*errs = append(*errs, err)
+				mu.Unlock()
 				continue
 			}
 			weeklyStats[day] = count
@@ -229,13 +235,14 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 			mu.Unlock()
 			return
 		}
-
 		for r.Next() {
 			var month string
 			var count int64
 			err := r.Scan(&month, &count)
 			if err != nil {
+				mu.Lock()
 				*errs = append(*errs, err)
+				mu.Unlock()
 				continue
 			}
 			monthlyStats[month] = count
@@ -267,7 +274,9 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 			var count int64
 			err := r.Scan(&os, &count)
 			if err != nil {
+				mu.Lock()
 				*errs = append(*errs, err)
+				mu.Unlock()
 				continue
 			}
 			osStats[os] = count
@@ -299,7 +308,9 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 			var count int64
 			err := r.Scan(&device, &count)
 			if err != nil {
+				mu.Lock()
 				*errs = append(*errs, err)
+				mu.Unlock()
 				continue
 			}
 			deviceStats[device] = count
@@ -331,7 +342,9 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 			var count int64
 			err := r.Scan(&browser, &count)
 			if err != nil {
+				mu.Lock()
 				*errs = append(*errs, err)
+				mu.Unlock()
 				continue
 			}
 			browserStats[browser] = count
@@ -364,13 +377,18 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 			var gd GeographicData
 			err := r.Scan(&gd.Country, &gd.CountryCode, &gd.ClickCount)
 			if err != nil {
+				mu.Lock()
 				*errs = append(*errs, err)
+				mu.Unlock()
 				continue
 			}
 			geographicStats = append(geographicStats, gd)
 		}
 		geoCh <- geographicStats
 	}()
+
+	wg2.Wait()
+
 	//  Collect results
 	analyticsStats.HourlyStats = <-hrCh
 	analyticsStats.DailyStats = <-dyCh
@@ -380,8 +398,6 @@ func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.
 	analyticsStats.DeviceStats = <-dvCh
 	analyticsStats.BrowserStats = <-brCh
 	analyticsStats.GeographicData = <-geoCh
-
-	wg2.Wait()
 
 	if len(*errs) > 0 {
 		return
