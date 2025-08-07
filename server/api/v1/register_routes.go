@@ -11,4 +11,7 @@ func RegisterRoutes(router *gin.RouterGroup) {
 	routes.Links(router)
 	routes.Dashboard(router)
 	routes.Analytics(router)
+
+	settingsGroup := router.Group("/settings")
+	routes.Settings(settingsGroup)
 }

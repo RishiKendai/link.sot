@@ -1,0 +1,55 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+.cq-settings {
+    container-type: inline-size;
+    container-name: settings;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--clr-border);
+        border-radius: 8px;
+    }
+}
+
+@container settings (min-width: 700px) {
+    .mobile-header {
+        display: none;
+    }
+
+    .settings-sidebar {
+        display: block;
+    }
+}
+
+@layer {
+
+    .cq-settings .sidebar-heading {
+        @apply text-base font-bold mb-2 px-4
+    }
+
+    .cq-settings .sidebar-items {
+        @apply py-2 px-4 hover:bg-gray-200 cursor-pointer text-gray-500
+    }
+
+    .cq-settings .sidebar-items.active {
+        @apply bg-[var(--clr-secondary)]/5 text-[var(--clr-secondary)]
+    }
+
+}
+
+@layer {
+    .api-keys-table td {
+        color: var(--text-secondary);
+
+        @apply text-sm
+    }
+}
+
+.api-keys-table tbody tr:nth-child(even),
+.api-keys-table tbody tr:nth-child(even) td {
+    background-color: var(--bg-secondary);
+}
