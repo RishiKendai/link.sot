@@ -2,20 +2,22 @@ package routes
 
 import (
 	"github.com/RishiKendai/sot/api/v1/controllers/links"
+	"github.com/RishiKendai/sot/middleware"
 	"github.com/RishiKendai/sot/pkg/services"
 	"github.com/gin-gonic/gin"
 )
 
 func Links(router *gin.RouterGroup) {
-	router.POST("/links", services.Authenticate(), links.CreateShortURLHandler())
-	router.GET("/links", services.Authenticate(), links.GetLinksHandler())
-	router.GET("/links/:id", services.Authenticate(), links.GetLinkHandler())
-	router.PUT("/links/:id", services.Authenticate(), links.UpdateLinkHandler())
-	router.DELETE("/links/:id", services.Authenticate(), links.DeleteLinkHandler())
-	router.GET("/links/availability/:alias", services.Authenticate(), links.CheckAliasAvailabilityHandler())
-	router.GET("/links/preview/:url", services.Authenticate(), links.PreviewHandler())
-	router.GET("/links/search", services.Authenticate(), links.SearchLinksHandler())
-	router.GET("/links/analytics/:uid", services.Authenticate(), links.GetLinkAnalyticsHandler())
+	router.Use(services.Authenticate(), middleware.InternalRateLimiter())
+	router.POST("/links", links.CreateShortURLHandler())
+	router.GET("/links", links.GetLinksHandler())
+	router.GET("/links/:id", links.GetLinkHandler())
+	router.PUT("/links/:id", links.UpdateLinkHandler())
+	router.DELETE("/links/:id", links.DeleteLinkHandler())
+	router.GET("/links/availability/:alias", links.CheckAliasAvailabilityHandler())
+	router.GET("/links/preview/:url", links.PreviewHandler())
+	router.GET("/links/search", links.SearchLinksHandler())
+	router.GET("/links/analytics/:uid", links.GetLinkAnalyticsHandler())
 }
 
 // RegisterPublicRoutes registers public short link handlers on the root router (no prefix)
