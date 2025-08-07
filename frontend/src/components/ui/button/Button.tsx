@@ -9,7 +9,8 @@ interface ButtonProps {
   postfixIcon?: React.ReactNode
   onClick?: () => void
   type?: 'button' | 'submit' | 'reset'
-  variant?: 'primary' | 'secondary' | 'tertiary'
+  autoFocus?: boolean
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger-primary' | 'danger-secondary' | 'danger-tertiary'
   className?: string
   disabled?: boolean
   label: string
@@ -24,12 +25,14 @@ const Button = ({
   className = 'leading-tight w-full h-10 text-lg',
   disabled = false,
   variant = 'primary',
+  autoFocus = false,
   label }: ButtonProps) => {
   return (
     <button 
+      autoFocus={autoFocus}
       type={type} 
       disabled={isPending || disabled} 
-      className={`rounded btn cursor-pointer relative ${className} ${variant}`} 
+      className={`rounded w-fit btn cursor-pointer relative ${className} ${variant}`} 
       onClick={onClick}
       style={{ minWidth: 'fit-content' }}
     >

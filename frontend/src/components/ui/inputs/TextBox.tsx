@@ -54,7 +54,7 @@ const TextBox: React.FC<TextBoxProps> = ({
             </label>}
 
             <div className={clsx(
-                'input-box',
+                'input-box mb-1',
                 {
                     'border-red-500 shadow-sm ring-1 ring-red-500': error,
                     'focus-within:border-[var(--clr-primary-invert)] ring-1 ring-transparent focus-within:ring-1 focus-within:ring-[var(--clr-primary-invert)]': !error

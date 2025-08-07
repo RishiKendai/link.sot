@@ -2,13 +2,11 @@
 @tailwind utilities;
 
 @layer {
-    
-    button.primary {
-        @apply bg-[var(--black-800)] text-white;
 
-        &:hover {
-            @apply bg-black;
-        }
+    button.primary {
+        background-image: var(--gradient-space-black-blue);
+
+        @apply text-white;
     }
 
     button.secondary {
@@ -31,5 +29,17 @@
         @apply opacity-90 cursor-not-allowed;
     }
 
+    button.danger-primary {
+        @apply text-white bg-red-600 hover:bg-red-700 focus:ring-red-500 outline-red-600
+        
+    }
+
+    button.danger-secondary {
+        @apply text-white bg-red-600 hover:bg-red-700 focus:ring-red-500 outline-red-600
+    }
+
+    button.danger-tertiary {
+        @apply text-white bg-red-600 hover:bg-red-700 focus:ring-red-500 outline-red-600
+    }
 
 }

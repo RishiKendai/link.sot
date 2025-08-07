@@ -267,3 +267,16 @@ body {
   border-radius: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
+
+.custom-scroll {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--clr-border);
+    border-radius: 8px;
+  }
+
+}
