@@ -1,17 +1,30 @@
 package rdb
 
-import "time"
+import (
+	"fmt"
+	"time"
+
+	"github.com/redis/go-redis/v9"
+)
 
 func (r *redisService) SetExpiry(key string, t time.Duration) error {
 	return r.client.Expire(r.ctx, key, t).Err()
 }
 
-func (r *redisService) Set(key string, value any, expiration time.Duration) error {
-	return r.client.Set(r.ctx, key, value, expiration).Err()
+func (r *redisService) Set(key string, value any, expiration *time.Duration) error {
+	fmt.Println("check>> ", value, expiration)
+	if expiration != nil {
+		return r.client.Set(r.ctx, key, value, *expiration).Err()
+	}
+	return r.client.Set(r.ctx, key, value, redis.KeepTTL).Err()
 }
 
 func (r *redisService) Get(key string) (string, error) {
 	return r.client.Get(r.ctx, key).Result()
+}
+
+func (r *redisService) GetInt(key string) (int, error) {
+	return r.client.Get(r.ctx, key).Int()
 }
 
 func (r *redisService) Del(key string) error {

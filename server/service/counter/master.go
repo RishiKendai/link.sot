@@ -24,7 +24,7 @@ func InitMasterCounter() {
 
 	if !exists {
 		fmt.Println("Initializing Redis key... ", startRange, blockSize, startRange+blockSize)
-		if err := rdb.RC.Set(globalKey, startRange+blockSize, 0); err != nil {
+		if err := rdb.RC.Set(globalKey, startRange+blockSize, nil); err != nil {
 			log.Fatalf("Failed to initialize Redis key: %s", err)
 		}
 	}

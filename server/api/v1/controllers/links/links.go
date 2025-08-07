@@ -82,7 +82,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 				redisExpiry = diff
 			}
 		}
-		rdb.RC.Set(sc, payload.Original_url, redisExpiry)
+		rdb.RC.Set(sc, payload.Original_url, &redisExpiry)
 
 		base := env.GetEnvKey("FE_BASE_URL")
 		if base == "" {
@@ -387,7 +387,8 @@ func GetLinkHandler() gin.HandlerFunc {
 			link.Tags = []string{}
 		}
 		lJSON, err := json.Marshal(link)
-		rdb.RC.Set(k, lJSON, time.Minute*5)
+		duration := time.Minute * 5
+		rdb.RC.Set(k, lJSON, &duration)
 
 		response.SendJSON(c, link, nil)
 	}
@@ -499,7 +500,7 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		}
 
 		// Set new entry in Redis
-		rdb.RC.Set(newShortLink, payload.Original_url, redisExpiry)
+		rdb.RC.Set(newShortLink, payload.Original_url, &redisExpiry)
 
 		base := env.GetEnvKey("FE_BASE_URL")
 		if base == "" {
