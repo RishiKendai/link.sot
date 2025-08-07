@@ -519,13 +519,13 @@ func DeleteLinkHandler() gin.HandlerFunc {
 		uid := c.GetString("uid")
 
 		// Check if the link exists and belongs to the user
-		var existingLink Link
-		sqlRow, err := postgres.FindOne("SELECT user_uid, uid, original_link, short_link, is_custom_backoff, created_at, expiry_date, password, scan_link, is_flagged, updated_at, deleted FROM links WHERE short_link = $1 AND user_uid = $2", shortLinkID, uid)
+		var sl string
+		sqlRow, err := postgres.FindOne("SELECT short_link FROM links WHERE uid = $1 AND user_uid = $2 AND deleted = false", shortLinkID, uid)
 		if err != nil {
 			response.SendServerError(c, err, nil)
 			return
 		}
-		err = sqlRow.Scan(&existingLink.User_uid, &existingLink.Uid, &existingLink.Original_url, &existingLink.Short_link, &existingLink.Is_custom_backoff, &existingLink.Created_at, &existingLink.Expiry_date, &existingLink.Password, &existingLink.Scan_link, &existingLink.Is_flagged, &existingLink.Updated_at, &existingLink.Deleted)
+		err = sqlRow.Scan(&sl)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				response.SendNotFoundError(c, "Link not found", nil)
@@ -536,13 +536,13 @@ func DeleteLinkHandler() gin.HandlerFunc {
 		}
 
 		// Soft delete: set deleted=true
-		_, err = postgres.UpdateOne("UPDATE links SET deleted = TRUE WHERE short_link = $1 AND user_uid = $2", shortLinkID, uid)
+		_, err = postgres.UpdateOne("UPDATE links SET deleted = TRUE WHERE uid = $1 AND user_uid = $2", shortLinkID, uid)
 		if err != nil {
 			response.SendServerError(c, err, nil)
 			return
 		}
 		// Soft delete: set deleted=true in analytics too
-		_, err = postgres.UpdateOne("UPDATE analytics SET deleted = TRUE WHERE short_link = $1 AND user_uid = $2", shortLinkID, uid)
+		_, err = postgres.UpdateOne("UPDATE analytics SET deleted = TRUE WHERE short_link = $1 AND user_uid = $2", sl, uid)
 		if err != nil {
 			response.SendServerError(c, err, nil)
 			return

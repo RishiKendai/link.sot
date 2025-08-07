@@ -15,7 +15,7 @@ import './linkcard.css'
 import IconQrCode from './ui/icons/IconQrCode';
 import ModalShare from './ModalShare';
 
-type LinkProps = {
+type LinkType = {
     user_uid: string;
     uid: string;
     original_url: string;
@@ -30,9 +30,15 @@ type LinkProps = {
     hide?: string[];
 }
 
+type LinkProps = {
+    link: LinkType;
+    setLinkId: React.Dispatch<React.SetStateAction<string>>;
+}
+
+
 const baseURL = import.meta.env.VITE_SOT_HOST
 
-const LinkCard: React.FC<{ link: LinkProps }> = ({ link }) => {
+const LinkCard: React.FC<LinkProps> = ({ link, setLinkId }) => {
     const { hide = [] } = link
     const navigate = useNavigate()
     const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null)
@@ -116,7 +122,7 @@ const LinkCard: React.FC<{ link: LinkProps }> = ({ link }) => {
                         {/* Copy */}
                         {hide && !hide.includes('copy') &&
                             <div
-                                className='flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200 relative group'
+                                className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200 relative group'
                                 onClick={() => {
                                     navigator.clipboard.writeText(baseURL + '/' + link.short_link)
                                     setCopiedLinkId(link.uid)
@@ -136,14 +142,14 @@ const LinkCard: React.FC<{ link: LinkProps }> = ({ link }) => {
                         }
                         {/* Edit */}
                         {hide && !hide.includes('edit') &&
-                            <div onClick={() => navigate(`/links/edit/${link.short_link}`)} className='flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200 relative group'>
+                            <div onClick={() => navigate(`/links/edit/${link.short_link}`)} className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200 relative group'>
                                 <IconEdit size={18} />
                                 <Tooltip text='Edit' dir='bottom' />
                             </div>
                         }
                         {/* Delete */}
                         {hide && !hide.includes('delete') &&
-                            <div className='flex items-center justify-center w-8 h-8 rounded-md hover:bg-red-100 border border-red-200 relative group'>
+                            <div onClick={() => setLinkId(link.uid)} className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-red-100 border border-red-200 relative group'>
                                 <IconDelete size={18} color='red' />
                                 <Tooltip text='Delete' dir='bottom' />
                             </div>
