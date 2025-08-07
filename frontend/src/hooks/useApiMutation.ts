@@ -71,6 +71,13 @@ export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutation
                     return Promise.reject({ error: 'Unauthorized' });
                 }
 
+                if(response.status === 429) {
+                    toast.error("Too many requests. Please try again later.", {
+                        duration: 4000,
+                    });
+                    return Promise.reject("Too many requests.")
+                }
+
                 const contentType = response.headers.get('Content-Type') || '';
                 const isJson = contentType.includes('application/json');
                 const json: ResponseProps = isJson ? await response.json() : {};
