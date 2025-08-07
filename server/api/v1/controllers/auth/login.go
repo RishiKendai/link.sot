@@ -40,7 +40,7 @@ func Login() gin.HandlerFunc {
 		}
 
 		// Check if user exists
-		row, err := postgres.FindOne("SELECT uid, name,email, password FROM users WHERE email = $1", user.Email)
+		row, err := postgres.FindOne("SELECT uid, name,email, password, token_version FROM users WHERE email = $1", user.Email)
 
 		if err != nil {
 			log.Println("Login controller:: ", err)
@@ -48,7 +48,8 @@ func Login() gin.HandlerFunc {
 			return
 		}
 		var uid, name, email, password string
-		err = row.Scan(&uid, &name, &email, &password)
+		var tkv int
+		err = row.Scan(&uid, &name, &email, &password, &tkv)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				log.Println("Login controller:: ", err)
@@ -68,7 +69,7 @@ func Login() gin.HandlerFunc {
 		}
 
 		// Generate JWT
-		token, err := services.GenerateJWT(uid, email, name)
+		token, err := services.GenerateJWT(uid, email, name, tkv)
 		if err != nil {
 			log.Println("Login controller:: ", err)
 			response.SendServerError(c, err, nil)
