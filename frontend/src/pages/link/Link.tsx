@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import './link.css'
 import Button from '../../components/ui/button/Button.tsx';
@@ -11,6 +11,10 @@ import IconChevronLeft from '../../components/ui/icons/IconChevronLeft.tsx';
 import IconChevronRight from '../../components/ui/icons/IconChevronRight.tsx';
 import clsx from 'clsx'
 import LinkCard from '../../components/LinkCard.tsx';
+import { useApiMutation } from '../../hooks/useApiMutation.ts';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import Modal from '../../components/ui/Modal.tsx';
 
 // Import the ExpiryDate type from DatePicker
 // https://www.google.com/s2/favicons?domain=${domain}&sz=${size}
@@ -32,6 +36,8 @@ type Link = {
 // const gradientList = ['gpb', 'gct', 'gge', 'gor']
 
 const Link: React.FC = () => {
+    const queryClient = useQueryClient()
+
     const [links, setLinks] = useState<Link[]>([])
     const [error, setError] = useState<string | null>(null)
     const [page, setPage] = useState(1)
@@ -39,7 +45,11 @@ const Link: React.FC = () => {
     const [pageSize, setPageSize] = useState(10)
     const [search, setSearch] = useState('')
     const [isSearching, setIsSearching] = useState(false)
+    const [linkId, setLinkId] = useState('')
     const navigate = useNavigate()
+
+
+    const { mutate: deleteLink, isPending: isDeleting } = useApiMutation(['delete-link'])
 
     const handleSearch = (search: string) => {
         setSearch(search)
@@ -62,7 +72,7 @@ const Link: React.FC = () => {
     })
 
     // Update links when data changes
-    React.useEffect(() => {
+    useEffect(() => {
         if (data?.status === 'success' && data.data) {
             setLinks(data.data.links)
             setTotal(data.data.total)
@@ -72,7 +82,7 @@ const Link: React.FC = () => {
     }, [data])
 
     // Show error toast when there's an error
-    React.useEffect(() => {
+    useEffect(() => {
         if (isError) {
             setError('Something went wrong. Please try again later.')
             // Auto-hide error after 5 seconds
@@ -100,128 +110,181 @@ const Link: React.FC = () => {
         return pages;
     }
 
+    const deleteLinkHandler = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        deleteLink({
+            path: `/links/${linkId}`,
+            method: 'DELETE',
+        }, {
+            onSuccess: (data) => {
+                if (data.status === 'success') {
+                    setLinkId('')
+                    queryClient.invalidateQueries({ queryKey: ['links'] })
+                    queryClient.invalidateQueries({ queryKey: ['links-search'] })
+
+                    toast.success("Link deleted successfully")
+                } else if (data.status === 'error') {
+                    setLinkId('')
+                    toast.error("Failed to delete link")
+                    console.error('Failed to delete link:: ', data.error)
+
+                }
+            },
+            onError: (err: unknown) => {
+                console.log('err :::: ', err)
+                setLinkId('')
+                toast.error('Failed to delete link')
+            }
+        })
+    }
+
     return (
-        <div className='w-full p-2 md:p-9'>
-            {/* Error Toast */}
-            {error && (
-                <div className='fixed top-4 right-4 z-50 max-w-sm'>
-                    <Alert
-                        type='danger'
-                        message={error}
-                        className='mb-4'
-                    />
+        <>
+            <div className='w-full p-3 md:p-9 md:red-500'>
+                {/* Error Toast */}
+                {error && (
+                    <div className='fixed top-4 right-4 z-50 max-w-sm'>
+                        <Alert
+                            type='danger'
+                            message={error}
+                            className='mb-4'
+                        />
+                    </div>
+                )}
+
+                <div className='flex items-center justify-between mb-4 '>
+                    <div>
+                        <h5 className='text-5xl font-black mb-4'>My Links</h5>
+                        <p className='text-gray-600 tex-xl font-light'>All your cosmic short links in one place</p>
+                    </div>
+                    <Button label='Create Link' className='gpb' onClick={() => navigate('/links/create')} isPending={false} />
+
                 </div>
-            )}
 
-            <div className='flex items-center justify-between mb-4 '>
-                <div>
-                    <h5 className='text-5xl font-black mb-4'>My Links</h5>
-                    <p className='text-gray-600 tex-xl font-light'>All your cosmic short links in one place</p>
-                </div>
-                <Button label='Create Link' className='gpb' onClick={() => navigate('/links/create')} isPending={false} />
+                {/* All Links */}
+                <section className='flex flex-col'>
+                    <Searchbar className='mb-6 mr-auto' placeholder='Search Links' onSearch={handleSearch} />
 
-            </div>
+                    <div className='flex flex-wrap w-full border-t border-gray-300 pt-12 gap-9'>
+                        {/* Loading State */}
+                        {isPending && (<LinkShimmer count={3} />)}
 
-            {/* All Links */}
-            <section className='flex flex-col'>
-                <Searchbar className='mb-6 mr-auto' placeholder='Search Links' onSearch={handleSearch} />
+                        {/* Data State - Show links if available */}
+                        {!isPending && !isError && links && links.length > 0 && (
+                            <div className='flex flex-col w-full gap-9'>
+                                {links.map((link) => (
+                                    <LinkCard key={link.uid} link={link} setLinkId={setLinkId} />
+                                ))}
 
-                <div className='flex flex-wrap w-full border-t border-gray-300 pt-12 gap-9'>
-                    {/* Loading State */}
-                    {isPending && (<LinkShimmer count={3} />)}
-
-                    {/* Data State - Show links if available */}
-                    {!isPending && !isError && links && links.length > 0 && (
-                        <div className='flex flex-col w-full gap-9'>
-                            {links.map((link) => (
-                                <LinkCard key={link.uid} link={link} />
-                            ))}
-
-                            {/* Pagination Controls */}
-                            <div className='flex justify-center items-center gap-4 mt-8'>
-                                <button
-                                    className={clsx(
-                                        'flex items-center text-base gap-2 px-2 py-2 rounded-lg border border-gray-300',
-                                        { 'hover:bg-[var(--clr-tertiary)]/10': page !== 1 },
-                                        { 'bg-gray-300 text-white': page === 1 },
-                                        { 'bg-white text-gray-700': page !== 1 }
-                                    )}
-                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                    disabled={page === 1}
-                                >
-                                    <IconChevronLeft size={22} />
-                                </button>
-                                <div className='flex gap-1'>
-                                    {getPageNumbers(page, totalPages).map((p, idx) =>
-                                        typeof p === 'number' ? (
-                                            <button
-                                                key={p}
-                                                className={clsx(
-                                                    'min-w-9 h-9 px-2 rounded-lg flex items-center justify-center text-base font-bold border border-gray-300',
-                                                    {
-                                                        'bg-[var(--clr-secondary)] text-white': p === page,
-                                                        'hover:bg-[var(--clr-tertiary)]/10 text-gray-700': p !== page,
-                                                        'bg-white text-[var(--clr-tertiary)]': p !== page
-                                                    }
-                                                )}
-                                                onClick={() => setPage(p)}
-                                                disabled={p === page}
-                                            >
-                                                {p}
-                                            </button>
-                                        ) : (
-                                            <span key={idx} className='w-9 h-9 flex items-center justify-center text-gray-400'>
-                                                ...
-                                            </span>
-                                        )
-                                    )}
+                                {/* Pagination Controls */}
+                                <div className='flex justify-center items-center gap-4 mt-8'>
+                                    <button
+                                        className={clsx(
+                                            'flex items-center text-base gap-2 px-2 py-2 rounded-lg border border-gray-300',
+                                            { 'hover:bg-[var(--clr-tertiary)]/10': page !== 1 },
+                                            { 'bg-gray-300 text-white': page === 1 },
+                                            { 'bg-white text-gray-700': page !== 1 }
+                                        )}
+                                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                        disabled={page === 1}
+                                    >
+                                        <IconChevronLeft size={22} />
+                                    </button>
+                                    <div className='flex gap-1'>
+                                        {getPageNumbers(page, totalPages).map((p, idx) =>
+                                            typeof p === 'number' ? (
+                                                <button
+                                                    key={p}
+                                                    className={clsx(
+                                                        'min-w-9 h-9 px-2 rounded-lg flex items-center justify-center text-base font-bold border border-gray-300',
+                                                        {
+                                                            'bg-[var(--clr-secondary)] text-white': p === page,
+                                                            'hover:bg-[var(--clr-tertiary)]/10 text-gray-700': p !== page,
+                                                            'bg-white text-[var(--clr-tertiary)]': p !== page
+                                                        }
+                                                    )}
+                                                    onClick={() => setPage(p)}
+                                                    disabled={p === page}
+                                                >
+                                                    {p}
+                                                </button>
+                                            ) : (
+                                                <span key={idx} className='w-9 h-9 flex items-center justify-center text-gray-400'>
+                                                    ...
+                                                </span>
+                                            )
+                                        )}
+                                    </div>
+                                    <button
+                                        className={clsx(
+                                            'flex items-center text-base gap-2 px-2 py-2 rounded-lg border border-gray-300',
+                                            { 'hover:bg-[var(--clr-tertiary)]/10': page !== totalPages },
+                                            { 'bg-gray-300 text-white': page === totalPages },
+                                            { 'bg-white text-gray-700': page !== totalPages }
+                                        )}
+                                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                        disabled={page === totalPages}
+                                    >
+                                        <IconChevronRight size={22} />
+                                    </button>
                                 </div>
-                                <button
-                                    className={clsx(
-                                        'flex items-center text-base gap-2 px-2 py-2 rounded-lg border border-gray-300',
-                                        { 'hover:bg-[var(--clr-tertiary)]/10': page !== totalPages },
-                                        { 'bg-gray-300 text-white': page === totalPages },
-                                        { 'bg-white text-gray-700': page !== totalPages }
-                                    )}
-                                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                    disabled={page === totalPages}
-                                >
-                                    <IconChevronRight size={22} />
-                                </button>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Empty State - Show when no data or error */}
-                    {!isPending && (!links || links.length === 0) && (
-                        <div className='flex items-center justify-center h-full p-8 flex-col text-center w-full'>
-                            <IconLink className='text-gray-400 mb-8 rotate-45' size={100} />
-                            <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                                {isError
-                                    ? 'Unable to Load Links'
-                                    : isSearching
-                                        ? 'No links found for your search.'
-                                        : 'No Short Links Yet!'}
-                            </h3>
-                            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                                {isError
-                                    ? 'There was an issue loading your links. Please try refreshing the page.'
-                                    : isSearching
-                                        ? 'Try a different search term or create a new short link.'
-                                        : "It looks like you haven't created any short links. Click the button below to get started!"}
-                            </p>
-                            <Button
-                                label={isError ? 'Try Again' : 'Create Short Link'}
-                                className='gpb'
-                                onClick={() => isError ? window.location.reload() : navigate('/links/create')}
-                                isPending={false}
-                            />
-                        </div>
-                    )}
+                        {/* Empty State - Show when no data or error */}
+                        {!isPending && (!links || links.length === 0) && (
+                            <div className='flex items-center justify-center h-full p-8 flex-col text-center w-full'>
+                                <IconLink className='text-gray-400 mb-8 rotate-45' size={100} />
+                                <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                                    {isError
+                                        ? 'Unable to Load Links'
+                                        : isSearching
+                                            ? 'No links found for your search.'
+                                            : 'No Short Links Yet!'}
+                                </h3>
+                                <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                                    {isError
+                                        ? 'There was an issue loading your links. Please try refreshing the page.'
+                                        : isSearching
+                                            ? 'Try a different search term or create a new short link.'
+                                            : "It looks like you haven't created any short links. Click the button below to get started!"}
+                                </p>
+                                <Button
+                                    label={isError ? 'Try Again' : 'Create Short Link'}
+                                    className='gpb'
+                                    onClick={() => isError ? window.location.reload() : navigate('/links/create')}
+                                    isPending={false}
+                                />
+                            </div>
+                        )}
 
-                </div>
-            </section>
-        </div>
+                    </div>
+                </section>
+            </div>
+            <Modal isOpen={linkId !== ''} onClose={() => setLinkId('')}>
+                <form onSubmit={deleteLinkHandler}>
+                    <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
+                    <p className="text-gray-600 mb-4">Are you sure you want to delete this short link?</p>
+                    <div className="flex justify-end">
+                        <Button
+                            variant='tertiary'
+                            label="Cancel"
+                            type='button'
+                            className='mr-2'
+                            onClick={() => setLinkId('')}
+                        />
+                        <Button
+                            label="Delete"
+                            variant='danger-primary'
+                            type='submit'
+                            autoFocus={true}
+                            className=''
+                            isPending={isDeleting}
+                        />
+                    </div>
+                </form>
+            </Modal>
+        </>
     )
 }
 
