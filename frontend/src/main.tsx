@@ -1,7 +1,7 @@
 // import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createBrowserRouter as Router, RouterProvider } from 'react-router-dom'
+import { Navigate, createBrowserRouter as Router, RouterProvider } from 'react-router-dom'
 
 import Layout from './Layout.tsx'
 
@@ -10,6 +10,9 @@ import './global.css'
 import ProtectedLayout from './context/ProtectedLayout.tsx'
 import lazyLoad from './lazyLoad.ts'
 import LinkAnalytics from './pages/link/LinkAnalytics.tsx'
+import Profile from './pages/settings/Profile.tsx'
+import Password from './pages/settings/Password.tsx'
+import API from './pages/settings/API.tsx'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const App = lazyLoad(() => import('./pages/App.tsx'))
@@ -22,7 +25,7 @@ const PublicLink = lazyLoad(() => import('./pages/PublicLink.tsx'))
 const PasswordVerification = lazyLoad(() => import('./pages/PasswordVerification.tsx'))
 const LinkDetails = lazyLoad(() => import('./pages/link/LinkDetails.tsx'))
 const ErrorPage = lazyLoad(() => import('./pages/ErrorPage.tsx'))
-const Settings = lazyLoad(() => import('./pages/Settings.tsx'))
+const Settings = lazyLoad(() => import('./pages/settings/Settings.tsx'))
 
 
 
@@ -80,9 +83,16 @@ const router = Router([
             path: '/analytics',
             element: <Analytics />,
             // errorElement: <ErrorPage />
-          }, {
+          },
+          {
             path: '/settings',
-            element: <Settings />
+            element: <Settings />, // this stays the layout
+            children: [
+              { index: true, element: <Navigate to="profile" replace /> }, // default redirect
+              { path: 'profile', element: <Profile /> },
+              { path: 'change-password', element: <Password /> },
+              { path: 'integrations/api', element: <API /> }
+            ]
           }
         ]
       }

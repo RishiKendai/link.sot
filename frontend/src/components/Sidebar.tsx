@@ -78,14 +78,14 @@ const Sidebar: React.FC = () => {
 
   // Effect to handle window resize and set `isMobileScreen` state
   useEffect(() => {
-    const currentLink = location.pathname
+    const currentPath = location.pathname
 
-    console.log('here ', currentLink)
-    console.log('s', currentLink.startsWith('/links'))
-    if (currentLink.startsWith('/links')) {
-      setActiveItem('/links')
-    } else {
-      setActiveItem(currentLink)
+    const matchedItem = menuItems.find((item) => {
+      return currentPath === item.link || currentPath.startsWith(item.link + '/');
+    });
+
+    if (matchedItem) {
+      setActiveItem(matchedItem.link);
     }
     const handleResize = () => {
       setIsMobileScreen(window.innerWidth < 768);
@@ -229,11 +229,10 @@ const Sidebar: React.FC = () => {
           >
             <div className="w-10 h-10 rounded-xl flex items-center justify-center relative">
               {/* Logo - shown when expanded, mobile, or not hovering on collapsed desktop */}
-              <div 
+              <div
                 ref={logoRef}
-                className={`w-full h-full flex items-center justify-center ${
-                  !isSidebarExpanded && !isMobileScreen ? 'block' : 'block'
-                } absolute top-0 left-0`}
+                className={`w-full h-full flex items-center justify-center ${!isSidebarExpanded && !isMobileScreen ? 'block' : 'block'
+                  } absolute top-0 left-0`}
               >
                 <img height={34} width={34} src='/logo.svg' alt='logo' />
               </div>
