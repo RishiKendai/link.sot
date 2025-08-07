@@ -29,13 +29,13 @@ func Login() gin.HandlerFunc {
 		var user User
 		if err := c.ShouldBindJSON(&user); err != nil {
 			log.Println("Login controller:: ", err)
-			response.SendBadRequestError(c, "Invalid request body", nil)
+			response.SendBadRequestError(c, "Invalid request body")
 			return
 		}
 
 		// Validate User
 		if err := validateUser(user); err != nil {
-			response.SendBadRequestError(c, err.Error(), nil)
+			response.SendBadRequestError(c, err.Error())
 			return
 		}
 
@@ -44,7 +44,7 @@ func Login() gin.HandlerFunc {
 
 		if err != nil {
 			log.Println("Login controller:: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		var uid, name, email, password string
@@ -53,18 +53,18 @@ func Login() gin.HandlerFunc {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				log.Println("Login controller:: ", err)
-				response.SendNotFoundError(c, "Invalid username or password.", nil)
+				response.SendNotFoundError(c, "Invalid username or password.")
 				return
 			}
 			log.Println("Login controller:: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
 		// Check if password is correct
 		if err := services.CheckPasswordHash(user.Password, password); !err {
 			log.Println("Login controller:: ", err)
-			response.SendBadRequestError(c, "Invalid password.", nil)
+			response.SendBadRequestError(c, "Invalid password.")
 			return
 		}
 
@@ -72,7 +72,7 @@ func Login() gin.HandlerFunc {
 		token, err := services.GenerateJWT(uid, email, name, tkv)
 		if err != nil {
 			log.Println("Login controller:: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -90,6 +90,6 @@ func Login() gin.HandlerFunc {
 		response.SendJSON(c, gin.H{
 			"email": email,
 			"name":  name,
-		}, nil)
+		})
 	}
 }

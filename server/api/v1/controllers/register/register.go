@@ -42,12 +42,12 @@ func Register() gin.HandlerFunc {
 		var user User
 		if err := c.ShouldBindJSON(&user); err != nil {
 			log.Println("Register controller:: ", err)
-			response.SendBadRequestError(c, "Invalid request body", nil)
+			response.SendBadRequestError(c, "Invalid request body")
 			return
 		}
 		// Validate User
 		if err := validateUser(user); err != nil {
-			response.SendBadRequestError(c, err.Error(), nil)
+			response.SendBadRequestError(c, err.Error())
 			return
 		}
 		// Email already exists
@@ -56,25 +56,25 @@ func Register() gin.HandlerFunc {
 		err := resp.Scan(&email)
 		if err != nil && err != sql.ErrNoRows {
 			log.Println("Register controller:: ", err)
-			response.SendServerError(c, errors.New("error checking email"), nil)
+			response.SendServerError(c, errors.New("error checking email"))
 			return
 		}
 		if email != "" {
-			response.SendBadRequestError(c, "Email already exists", nil)
+			response.SendBadRequestError(c, "Email already exists")
 			return
 		}
 		// Hash Password
 		hashedPassword, err := services.HashPassword(user.Password)
 		if err != nil {
 			log.Println("Register controller:: ", err)
-			response.SendBadRequestError(c, "Error hashing password", nil)
+			response.SendBadRequestError(c, "Error hashing password")
 			return
 		}
 		// Save to postgres
 		resp, err = postgres.InsertOne("INSERT INTO users (email, password, name) VALUES ($1, $2, $3) RETURNING uid", user.Email, hashedPassword, user.Name)
 		if err != nil {
 			log.Println("Register controller:: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		// Generate JWT
@@ -82,13 +82,13 @@ func Register() gin.HandlerFunc {
 		err = resp.Scan(&id)
 		if err != nil {
 			log.Println("Register controller:: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		token, err := services.GenerateJWT(id, user.Email, user.Name, 1)
 		if err != nil {
 			log.Println("Register controller:: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -97,6 +97,6 @@ func Register() gin.HandlerFunc {
 		response.SendJSON(c, gin.H{
 			"name":  user.Name,
 			"email": user.Email,
-		}, nil)
+		})
 	}
 }

@@ -29,11 +29,7 @@ type ErrorResponse = {
     message?: string;
 };
 
-type CommonProps = {
-    action: string | null;
-};
-
-export type ResponseProps<T = unknown> = (SuccessResponse<T> & CommonProps) | (ErrorResponse & CommonProps);
+export type ResponseProps<T = unknown> = (SuccessResponse<T> ) | (ErrorResponse);
 
 function buildUrl(path: string, queryParams?: Record<string, unknown>): string {
     path = '/proxy' + path;
@@ -70,7 +66,7 @@ export function useApiQuery<TResponse = unknown>({
             } else if (!isAuth && isAuthenticated) {
                 setAuthenticated(false);
                 navigate('/login');
-                return Promise.reject({ error: 'Unauthorized', status: 'error', action: null, message: 'Unauthorized' });
+                return Promise.reject({ error: 'Unauthorized', status: 'error', message: 'Unauthorized' });
             }
             if (res.status === 429) {
                 toast.error("Too many requests. Please try again later.", {
@@ -83,14 +79,12 @@ export function useApiQuery<TResponse = unknown>({
             const contentType = res.headers.get('content-type');
             const isJson = contentType && contentType.includes('application/json');
             const json = isJson ? await res.json() : {};
-            const action = (json && 'action' in json) ? json.action : null;
 
             if (!res.ok) {
                 return {
                     status: 'error',
                     error: (json && 'error' in json) ? json.error : `Error ${res.status}: ${res.statusText}`,
                     message: (json && 'message' in json) ? json.message : '',
-                    action,
                 };
             }
             return json as ResponseProps<TResponse>
@@ -106,7 +100,6 @@ export function useApiQuery<TResponse = unknown>({
             return {
                 status: 'error',
                 error: errorMessage,
-                action: null,
                 message: errorMessage,
             };
         }

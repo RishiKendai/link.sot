@@ -11,7 +11,7 @@ import (
 func ErrorHandler(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
-			response.SendServerError(c, fmt.Errorf("%v", err), nil)
+			response.SendServerError(c, fmt.Errorf("%v", err))
 		}
 	}()
 	c.Next()

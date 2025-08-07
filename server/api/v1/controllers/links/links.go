@@ -22,7 +22,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var payload CreateShortURLPayload
 		if c.ShouldBindJSON(&payload) != nil {
-			response.SendBadRequestError(c, "Invalid request body", nil)
+			response.SendBadRequestError(c, "Invalid request body")
 			return
 		}
 		// Ensure expiry_date is always UTC
@@ -30,7 +30,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 			payload.Expiry_date = payload.Expiry_date.UTC()
 		}
 		if payload.Original_url == "" {
-			response.SendBadRequestError(c, "URL is required", nil)
+			response.SendBadRequestError(c, "URL is required")
 			return
 		}
 
@@ -39,7 +39,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		if !isSafe {
 			payload.Is_flagged = true
 			// Optionally, you can return an error here if you want to block malicious URLs
-			// response.SendBadRequestError(c, "URL is flagged", nil)
+			// response.SendBadRequestError(c, "URL is flagged")
 			// return
 		}
 
@@ -55,7 +55,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		}
 		uidRaw, exists := c.Get("uid")
 		if !exists {
-			response.SendServerError(c, nil, nil)
+			response.SendServerError(c, nil)
 			return
 		}
 		uid := uidRaw.(string)
@@ -70,7 +70,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		}
 		_, err := postgres.InsertOne(query, uid, payload.Original_url, sc, expiry, payload.Password, payload.Scan_link, payload.Is_flagged, isCustomBackoff, payload.Tags)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -90,7 +90,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		}
 		response.SendJSON(c, bson.M{
 			"short_code": sc,
-		}, nil)
+		})
 	}
 }
 
@@ -100,7 +100,7 @@ func CheckAliasAvailabilityHandler() gin.HandlerFunc {
 		alias := c.Param("alias")
 		isAvailable, err := IsAliasAvailable(alias, "")
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -116,7 +116,7 @@ func RedirectHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		sot := c.Param("sot") // or "short" depending on your route
 		if sot == "" {
-			response.SendBadRequestError(c, "Short link not provided", nil)
+			response.SendBadRequestError(c, "Short link not provided")
 			return
 		}
 		isQR := c.Query("r") == "qr"
@@ -128,7 +128,7 @@ func RedirectHandler() gin.HandlerFunc {
 		sqlRow, err := postgres.FindOne("SELECT * FROM links WHERE short_link = $1", sot)
 		if err != nil {
 			fmt.Println("Error:", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		err = sqlRow.Scan(&link.User_uid, &link.Uid, &link.Original_url, &link.Short_link, &link.Is_custom_backoff, &link.Created_at, &link.Expiry_date, &link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at, &tagsJSON, &link.Deleted)
@@ -138,7 +138,7 @@ func RedirectHandler() gin.HandlerFunc {
 				response.ServeHTMLFile(c, "link_not_found.html", 404)
 				return
 			}
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		if link.Deleted {
@@ -200,12 +200,12 @@ func GetLinksHandler() gin.HandlerFunc {
 		var total int
 		totalRow, err := postgres.FindOne("SELECT COUNT(*) FROM links WHERE user_uid = $1 AND deleted = false", uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		err = totalRow.Scan(&total)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -213,7 +213,7 @@ func GetLinksHandler() gin.HandlerFunc {
 		query := "SELECT * FROM links WHERE user_uid = $1 AND deleted = false ORDER BY created_at DESC LIMIT $2 OFFSET $3"
 		sqlRows, err := postgres.FindMany(query, uid, pageSize, offset)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		var links []Link
@@ -222,7 +222,7 @@ func GetLinksHandler() gin.HandlerFunc {
 			var tagsJSON []byte
 			err = sqlRows.Scan(&link.User_uid, &link.Uid, &link.Original_url, &link.Short_link, &link.Is_custom_backoff, &link.Created_at, &link.Expiry_date, &link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at, &tagsJSON, &link.Deleted)
 			if err != nil {
-				response.SendServerError(c, err, nil)
+				response.SendServerError(c, err)
 				return
 			}
 			// Ensure expiry_date is UTC
@@ -231,7 +231,7 @@ func GetLinksHandler() gin.HandlerFunc {
 			if len(tagsJSON) > 0 {
 				err = json.Unmarshal(tagsJSON, &link.Tags)
 				if err != nil {
-					response.SendServerError(c, err, nil)
+					response.SendServerError(c, err)
 					return
 				}
 			} else {
@@ -240,7 +240,7 @@ func GetLinksHandler() gin.HandlerFunc {
 			links = append(links, link)
 		}
 		if err = sqlRows.Err(); err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		paginated := PaginatedLinksResponse{
@@ -249,7 +249,7 @@ func GetLinksHandler() gin.HandlerFunc {
 			Page:     page,
 			PageSize: pageSize,
 		}
-		response.SendJSON(c, paginated, nil)
+		response.SendJSON(c, paginated)
 	}
 }
 
@@ -258,7 +258,7 @@ func SearchLinksHandler() gin.HandlerFunc {
 		uid := c.GetString("uid")
 		query := c.Query("q")
 		if query == "" {
-			response.SendBadRequestError(c, "Missing search query", nil)
+			response.SendBadRequestError(c, "Missing search query")
 			return
 		}
 
@@ -284,12 +284,12 @@ func SearchLinksHandler() gin.HandlerFunc {
 		var total int
 		totalRow, err := postgres.FindOne(totalQuery, uid, "%"+query+"%")
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		err = totalRow.Scan(&total)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -297,7 +297,7 @@ func SearchLinksHandler() gin.HandlerFunc {
 		searchQuery := `SELECT * FROM links WHERE user_uid = $1 AND (short_link ILIKE $2 OR original_link ILIKE $2) AND deleted = false ORDER BY created_at DESC LIMIT $3 OFFSET $4`
 		sqlRows, err := postgres.FindMany(searchQuery, uid, "%"+query+"%", pageSize, offset)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		defer sqlRows.Close()
@@ -307,14 +307,14 @@ func SearchLinksHandler() gin.HandlerFunc {
 			var tagsJSON []byte
 			err = sqlRows.Scan(&link.User_uid, &link.Uid, &link.Original_url, &link.Short_link, &link.Is_custom_backoff, &link.Created_at, &link.Expiry_date, &link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at, &tagsJSON, &link.Deleted)
 			if err != nil {
-				response.SendServerError(c, err, nil)
+				response.SendServerError(c, err)
 				return
 			}
 			link.Expiry_date = link.Expiry_date.UTC()
 			if len(tagsJSON) > 0 {
 				err = json.Unmarshal(tagsJSON, &link.Tags)
 				if err != nil {
-					response.SendServerError(c, err, nil)
+					response.SendServerError(c, err)
 					return
 				}
 			} else {
@@ -323,7 +323,7 @@ func SearchLinksHandler() gin.HandlerFunc {
 			links = append(links, link)
 		}
 		if err = sqlRows.Err(); err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		paginated := PaginatedLinksResponse{
@@ -332,7 +332,7 @@ func SearchLinksHandler() gin.HandlerFunc {
 			Page:     page,
 			PageSize: pageSize,
 		}
-		response.SendJSON(c, paginated, nil)
+		response.SendJSON(c, paginated)
 	}
 }
 
@@ -349,10 +349,10 @@ func GetLinkHandler() gin.HandlerFunc {
 			d := Link{}
 			err = json.Unmarshal([]byte(cd), &d)
 			if err != nil {
-				response.SendServerError(c, err, nil)
+				response.SendServerError(c, err)
 				return
 			}
-			response.SendJSON(c, d, nil)
+			response.SendJSON(c, d)
 
 			return
 		}
@@ -362,16 +362,16 @@ func GetLinkHandler() gin.HandlerFunc {
 		var tagsJSON []byte
 		sqlRow, err := postgres.FindOne("SELECT * FROM links WHERE short_link = $1 AND user_uid = $2 AND deleted = false", id, uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		err = sqlRow.Scan(&link.User_uid, &link.Uid, &link.Original_url, &link.Short_link, &link.Is_custom_backoff, &link.Created_at, &link.Expiry_date, &link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at, &tagsJSON, &link.Deleted)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				response.SendNotFoundError(c, "Link not found", nil)
+				response.SendNotFoundError(c, "Link not found")
 				return
 			}
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		// Ensure expiry_date is UTC
@@ -380,7 +380,7 @@ func GetLinkHandler() gin.HandlerFunc {
 		if len(tagsJSON) > 0 {
 			err = json.Unmarshal(tagsJSON, &link.Tags)
 			if err != nil {
-				response.SendServerError(c, err, nil)
+				response.SendServerError(c, err)
 				return
 			}
 		} else {
@@ -390,7 +390,7 @@ func GetLinkHandler() gin.HandlerFunc {
 		duration := time.Minute * 5
 		rdb.RC.Set(k, lJSON, &duration)
 
-		response.SendJSON(c, link, nil)
+		response.SendJSON(c, link)
 	}
 }
 
@@ -398,7 +398,7 @@ func UpdateLinkHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var payload CreateShortURLPayload
 		if err := c.ShouldBindJSON(&payload); err != nil {
-			response.SendBadRequestError(c, "Invalid request body", nil)
+			response.SendBadRequestError(c, "Invalid request body")
 			return
 		}
 		// Ensure expiry_date is always UTC
@@ -414,23 +414,23 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		var tagsJSON []byte
 		sqlRow, err := postgres.FindOne("SELECT * FROM links WHERE short_link = $1 AND user_uid = $2 AND deleted = false", shortLinkID, uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		err = sqlRow.Scan(&existingLink.User_uid, &existingLink.Uid, &existingLink.Original_url, &existingLink.Short_link, &existingLink.Is_custom_backoff, &existingLink.Created_at, &existingLink.Expiry_date, &existingLink.Password, &existingLink.Scan_link, &existingLink.Is_flagged, &existingLink.Updated_at, &tagsJSON, &existingLink.Deleted)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				response.SendNotFoundError(c, "Link not found", nil)
+				response.SendNotFoundError(c, "Link not found")
 				return
 			}
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		// Unmarshal JSONB tags into []string
 		if len(tagsJSON) > 0 {
 			err = json.Unmarshal(tagsJSON, &existingLink.Tags)
 			if err != nil {
-				response.SendServerError(c, err, nil)
+				response.SendServerError(c, err)
 				return
 			}
 		} else {
@@ -446,11 +446,11 @@ func UpdateLinkHandler() gin.HandlerFunc {
 			// Check if the new custom back half is available
 			isAvailable, err := IsAliasAvailable(payload.Custom_backoff, existingLink.Short_link)
 			if err != nil {
-				response.SendServerError(c, err, nil)
+				response.SendServerError(c, err)
 				return
 			}
 			if !isAvailable {
-				response.SendBadRequestError(c, "Custom back half already exists", nil)
+				response.SendBadRequestError(c, "Custom back half already exists")
 				return
 			}
 			newShortLink = payload.Custom_backoff
@@ -481,7 +481,7 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		query := "UPDATE links SET original_link = $1, short_link = $2, expiry_date = $3, password = $4, scan_link = $5, is_flagged = $6, is_custom_backoff = $7, updated_at = NOW(), tags = $8 WHERE short_link = $9 AND user_uid = $10"
 		_, err = postgres.UpdateOne(query, payload.Original_url, newShortLink, expiry, payload.Password, payload.Scan_link, payload.Is_flagged, isCustomBackoff, payload.Tags, existingLink.Short_link, uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -510,7 +510,7 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		response.SendJSON(c, bson.M{
 			"short_link": base + "/api/v1/links/" + newShortLink,
 			"message":    "Link updated successfully",
-		}, nil)
+		})
 	}
 }
 
@@ -523,29 +523,29 @@ func DeleteLinkHandler() gin.HandlerFunc {
 		var sl string
 		sqlRow, err := postgres.FindOne("SELECT short_link FROM links WHERE uid = $1 AND user_uid = $2 AND deleted = false", shortLinkID, uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		err = sqlRow.Scan(&sl)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				response.SendNotFoundError(c, "Link not found", nil)
+				response.SendNotFoundError(c, "Link not found")
 				return
 			}
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
 		// Soft delete: set deleted=true
 		_, err = postgres.UpdateOne("UPDATE links SET deleted = TRUE WHERE uid = $1 AND user_uid = $2", shortLinkID, uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		// Soft delete: set deleted=true in analytics too
 		_, err = postgres.UpdateOne("UPDATE analytics SET deleted = TRUE WHERE short_link = $1 AND user_uid = $2", sl, uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -554,7 +554,7 @@ func DeleteLinkHandler() gin.HandlerFunc {
 
 		response.SendJSON(c, bson.M{
 			"message": "Link deleted successfully",
-		}, nil)
+		})
 	}
 }
 
@@ -562,16 +562,16 @@ func PreviewHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		url := c.Query("url")
 		if !IsValidURL(url) {
-			response.SendBadRequestError(c, "Invalid URL", nil)
+			response.SendBadRequestError(c, "Invalid URL")
 			return
 		}
 
 		data, err := fetchMetadata(url)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
-		response.SendJSON(c, data, nil)
+		response.SendJSON(c, data)
 	}
 }
 
@@ -582,7 +582,7 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 		var payload PasswordVerificationPayload
 		if err := c.ShouldBind(&payload); err != nil {
 			fmt.Println("Error: ", err)
-			response.SendBadRequestError(c, "Invalid request body", nil)
+			response.SendBadRequestError(c, "Invalid request body")
 			return
 		}
 
@@ -591,29 +591,29 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 		var tagsJSON []byte
 		sqlRow, err := postgres.FindOne("SELECT * FROM links WHERE short_link = $1 AND deleted = false", shortLink)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		err = sqlRow.Scan(&link.User_uid, &link.Uid, &link.Original_url, &link.Short_link, &link.Is_custom_backoff, &link.Created_at, &link.Expiry_date, &link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at, &tagsJSON, &link.Deleted)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				response.SendNotFoundError(c, "Link not found", nil)
+				response.SendNotFoundError(c, "Link not found")
 				return
 			}
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
 		// Check if link is password protected
 		if link.Password == nil || *link.Password == "" {
-			response.SendBadRequestError(c, "Link is not password protected", nil)
+			response.SendBadRequestError(c, "Link is not password protected")
 			return
 		}
 
 		// Verify password
 		fmt.Println("Password: ", *link.Password, payload.Password)
 		if *link.Password != payload.Password {
-			// response.SendBadRequestError(c, "Incorrect password", nil)
+			// response.SendBadRequestError(c, "Incorrect password")
 			response.ServeHTML(c, 401, "link_password.html", bson.M{
 				"Error":    "Incorrect password",
 				"Password": payload.Password,
@@ -624,7 +624,7 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 
 		// Check if link has expired
 		if !link.Expiry_date.IsZero() && time.Now().UTC().After(link.Expiry_date) {
-			response.SendBadRequestError(c, "Link has expired", nil)
+			response.SendBadRequestError(c, "Link has expired")
 			return
 		}
 
@@ -659,22 +659,22 @@ func GetLinkAnalyticsHandler() gin.HandlerFunc {
 		}
 
 		if shortLink == "" {
-			response.SendBadRequestError(c, "Invalid request body", nil)
+			response.SendBadRequestError(c, "Invalid request body")
 			return
 		}
 		// Get short_link from links table and check if it is deleted
 		sqlRow, err := postgres.FindOne("SELECT short_link, original_link, expiry_date, password, deleted, created_at  FROM links WHERE uid = $1", shortLink)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		err = sqlRow.Scan(&sc.ShortLink, &sc.OriginalLink, &sc.ExpiriesOn, &sc.Password, &sc.Deleted, &sc.CreatedOn)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				response.SendNotFoundError(c, "Link not found", nil)
+				response.SendNotFoundError(c, "Link not found")
 				return
 			}
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		if sc.Deleted {
@@ -691,6 +691,6 @@ func GetLinkAnalyticsHandler() gin.HandlerFunc {
 			analytics.IsPasswordProtected = false
 		}
 		analytics.ExpiriesOn = sc.ExpiriesOn
-		response.SendJSON(c, analytics, nil)
+		response.SendJSON(c, analytics)
 	}
 }

@@ -12,6 +12,6 @@ func AuthStatus() gin.HandlerFunc {
 		response.SendJSON(c, gin.H{
 			"email": email,
 			"name":  name,
-		}, nil)
+		})
 	}
 }

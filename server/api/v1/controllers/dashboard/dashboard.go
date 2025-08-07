@@ -16,14 +16,14 @@ func Dashboard() gin.HandlerFunc {
 
 		uid_raw, exists := c.Get("uid")
 		if !exists {
-			response.SendUnAuthorizedError(c, "User not authenticated", nil)
+			response.SendUnAuthorizedError(c, "User not authenticated")
 			return
 		}
 		uid := uid_raw.(string)
 
 		dashboard = fetchDashboardData(uid)
 
-		response.SendJSON(c, dashboard, nil)
+		response.SendJSON(c, dashboard)
 	}
 }
 

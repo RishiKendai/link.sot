@@ -21,7 +21,7 @@ func InternalRateLimiter() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uidRaw, exists := c.Get("uid")
 		if !exists {
-			response.SendUnAuthorizedError(c, "User not authenticated", nil)
+			response.SendUnAuthorizedError(c, "User not authenticated")
 			c.Abort()
 			return
 		}
@@ -30,13 +30,13 @@ func InternalRateLimiter() gin.HandlerFunc {
 		// Counter key per user per window
 		l, err := strconv.Atoi(env.GetEnvKey("RL_LIMIT"))
 		if err != nil {
-			response.SendServerError(c, fmt.Errorf("invalid RL_LIMIT: %v", l), nil)
+			response.SendServerError(c, fmt.Errorf("invalid RL_LIMIT: %v", l))
 			c.Abort()
 			return
 		}
 		w, err := strconv.Atoi(env.GetEnvKey("RL_WINDOW"))
 		if err != nil {
-			response.SendServerError(c, fmt.Errorf("invalid RL_LIMIT: %v", w), nil)
+			response.SendServerError(c, fmt.Errorf("invalid RL_LIMIT: %v", w))
 			c.Abort()
 			return
 		}
@@ -47,7 +47,7 @@ func InternalRateLimiter() gin.HandlerFunc {
 		cntr, err := rdb.RC.GetInt(cntr_key)
 		if err != nil && err.Error() != "redis: nil" {
 			fmt.Println("RateLimiter Redis error: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			c.Abort()
 			return
 		}
@@ -71,7 +71,7 @@ func InternalRateLimiter() gin.HandlerFunc {
 		}
 		if err != nil {
 			fmt.Println("RateLimiter SET error: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			c.Abort()
 			return
 		}

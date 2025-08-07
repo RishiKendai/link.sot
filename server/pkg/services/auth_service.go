@@ -62,7 +62,7 @@ func Authenticate() gin.HandlerFunc {
 
 		if err != nil || jt == "" {
 			fmt.Println("err jt", err)
-			response.SendUnAuthorizedError(c, "Unauthorized", nil)
+			response.SendUnAuthorizedError(c, "Unauthorized")
 			return
 		}
 
@@ -73,14 +73,14 @@ func Authenticate() gin.HandlerFunc {
 			return jwtSecret, nil
 		})
 		if err != nil {
-			response.SendUnAuthorizedError(c, err.Error(), nil)
+			response.SendUnAuthorizedError(c, err.Error())
 			return
 		}
 
 		// Get Claims
 		claims, ok := token.Claims.(*CustomClaims)
 		if !ok || !token.Valid {
-			response.SendUnAuthorizedError(c, "Invalid token claims", nil)
+			response.SendUnAuthorizedError(c, "Invalid token claims")
 			return
 		}
 
@@ -91,7 +91,7 @@ func Authenticate() gin.HandlerFunc {
 		// Check in cache
 		u, err := rdb.RC.HGetAll("user:" + uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		var name string
@@ -101,25 +101,25 @@ func Authenticate() gin.HandlerFunc {
 			name = u["name"]
 			tkv, err = strconv.Atoi(u["token_version"])
 			if err != nil {
-				response.SendUnAuthorizedError(c, "Corrupted token", nil)
+				response.SendUnAuthorizedError(c, "Corrupted token")
 				return
 			}
 		} else {
 			// fallback to postgres
 			row, err := postgres.FindOne("SELECT name, token_version FROM users WHERE uid = $1", uid)
 			if err != nil {
-				response.SendServerError(c, err, nil)
+				response.SendServerError(c, err)
 				return
 			}
 			err = row.Scan(&name, &tkv)
 			if err != nil {
-				response.SendUnAuthorizedError(c, "User not found", nil)
+				response.SendUnAuthorizedError(c, "User not found")
 				return
 			}
 		}
 		if tkv != claimed_tkv {
 			c.SetCookie("token", "", -1, "/", "", false, true)
-			response.SendUnAuthorizedError(c, "session_expired", nil)
+			response.SendUnAuthorizedError(c, "session_expired")
 			return
 		}
 

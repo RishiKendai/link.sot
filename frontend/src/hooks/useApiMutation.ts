@@ -29,14 +29,10 @@ type UnknownErrorResponse = {
     status: 'unknown_error';
 }
 
-type CommonProps = {
-    action: string | null;
-};
-
 export type ResponseProps<T = unknown> =
-    | (SuccessResponse<T> & CommonProps)
-    | (ErrorResponse & CommonProps)
-    | (UnknownErrorResponse & CommonProps)
+    | (SuccessResponse<T>)
+    | (ErrorResponse)
+    | (UnknownErrorResponse)
 
 export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutationKey: string[]) {
     const { isAuthenticated, setAuthenticated } = useAuth();
@@ -71,7 +67,7 @@ export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutation
                     return Promise.reject({ error: 'Unauthorized' });
                 }
 
-                if(response.status === 429) {
+                if (response.status === 429) {
                     toast.error("Too many requests. Please try again later.", {
                         duration: 4000,
                     });
@@ -82,15 +78,11 @@ export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutation
                 const isJson = contentType.includes('application/json');
                 const json: ResponseProps = isJson ? await response.json() : {};
 
-                // Extract action if present (optional)
-                const action = (json && 'action' in json) ? json.action : null;
-
                 if (!response.ok) {
                     if (response.status === 404) {
                         return {
                             status: 'error' as const,
                             error: (json && 'error' in json) ? json.error : 'Something went wrong.',
-                            action,
                         }
                     }
                 }
@@ -106,7 +98,6 @@ export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutation
                 return {
                     status: 'unknown_error' as const,
                     error: errorMessage,
-                    action: null,
                 };
             }
         },

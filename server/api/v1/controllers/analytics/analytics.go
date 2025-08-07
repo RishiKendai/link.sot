@@ -15,7 +15,7 @@ func GetAnalyticsHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userUID, exists := c.Get("uid")
 		if !exists {
-			response.SendUnAuthorizedError(c, "User not authenticated", nil)
+			response.SendUnAuthorizedError(c, "User not authenticated")
 			return
 		}
 
@@ -32,11 +32,11 @@ func GetAnalyticsHandler() gin.HandlerFunc {
 
 		analytics, err := getAnalyticsSummary(userUID.(string), startDate, endDate)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
-		response.SendJSON(c, analytics, nil)
+		response.SendJSON(c, analytics)
 	}
 }
 
@@ -45,35 +45,35 @@ func GetLinkAnalyticsHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userUID, exists := c.Get("uid")
 		if !exists {
-			response.SendUnAuthorizedError(c, "User not authenticated", nil)
+			response.SendUnAuthorizedError(c, "User not authenticated")
 			return
 		}
 
 		shortLink := c.Param("shortLink")
 		if shortLink == "" {
-			response.SendBadRequestError(c, "Short link is required", nil)
+			response.SendBadRequestError(c, "Short link is required")
 			return
 		}
 
 		// Verify the link belongs to the user
 		row, err := postgres.FindOne("SELECT short_link FROM links WHERE short_link = $1 AND user_uid = $2", shortLink, userUID)
 		if err != nil {
-			response.SendNotFoundError(c, "Link not found", nil)
+			response.SendNotFoundError(c, "Link not found")
 			return
 		}
 		var link string
 		if err := row.Scan(&link); err != nil {
-			response.SendNotFoundError(c, "Link not found", nil)
+			response.SendNotFoundError(c, "Link not found")
 			return
 		}
 
 		analytics, err := getLinkAnalytics(shortLink)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
-		response.SendJSON(c, analytics, nil)
+		response.SendJSON(c, analytics)
 	}
 }
 

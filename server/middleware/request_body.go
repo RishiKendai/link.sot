@@ -14,7 +14,7 @@ func SaveRequestBody(c *gin.Context) {
 	if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodPut || c.Request.Method == http.MethodPatch {
 		bodyBytes, err := io.ReadAll(c.Request.Body)
 		if err != nil {
-			response.SendUnAuthorizedError(c, "Authentication Failed", nil)
+			response.SendUnAuthorizedError(c, "Authentication Failed")
 			return
 		}
 		c.Set("requestBody", bodyBytes)

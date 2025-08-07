@@ -17,28 +17,28 @@ func UpdateProfile() gin.HandlerFunc {
 		// Get paylaod
 		uid := c.GetString("uid")
 		if uid == "" {
-			response.SendServerError(c, errors.New("invalid request. uid is required"), nil)
+			response.SendServerError(c, errors.New("invalid request. uid is required"))
 			return
 		}
 		var profile Profile
 		if err := c.ShouldBindJSON(&profile); err != nil {
-			response.SendBadRequestError(c, "Invalid request body", nil)
+			response.SendBadRequestError(c, "Invalid request body")
 			return
 		}
 		// update in postgres and update token
 		result, err := postgres.UpdateOne("UPDATE users SET name = $1 WHERE uid = $2", profile.Name, uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
 		rowsAffected, err := result.RowsAffected()
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		if rowsAffected == 0 {
-			response.SendBadRequestError(c, "User not found", nil)
+			response.SendBadRequestError(c, "User not found")
 			return
 		}
 
@@ -50,7 +50,7 @@ func UpdateProfile() gin.HandlerFunc {
 		// send response
 		response.SendJSON(c, gin.H{
 			"name": profile.Name,
-		}, nil)
+		})
 	}
 }
 
@@ -61,48 +61,48 @@ func UpdatePassword() gin.HandlerFunc {
 		email := c.GetString("email")
 		name := c.GetString("name")
 		if uid == "" {
-			response.SendServerError(c, errors.New("invalid request. uid is required"), nil)
+			response.SendServerError(c, errors.New("invalid request. uid is required"))
 			return
 		}
 		var password Password
 		if err := c.ShouldBindJSON(&password); err != nil {
-			response.SendBadRequestError(c, "Invalid request body", nil)
+			response.SendBadRequestError(c, "Invalid request body")
 			return
 		}
 		// Get password from postgres and check if it is correct
 		r, err := postgres.FindOne("SELECT password FROM users WHERE uid = $1", uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		var pswd string
 		err = r.Scan(&pswd)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		// compare passwords
 		if isValid := services.CheckPasswordHash(password.OldPassword, pswd); !isValid {
 			// else send error
 			log.Println("Password does not match")
-			response.SendBadRequestError(c, "password_mismatch", nil)
+			response.SendBadRequestError(c, "password_mismatch")
 			return
 		}
 		// if correct update password
 		hpswd, err := services.HashPassword(password.NewPassword)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		res, err := postgres.UpdateOneReturning("UPDATE users SET password = $1, token_version = token_version + 1 WHERE uid = $2 RETURNING token_version", hpswd, uid)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		var tkv int
 		err = res.Scan(&tkv)
 		if err != nil {
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 		// update redis
@@ -114,7 +114,7 @@ func UpdatePassword() gin.HandlerFunc {
 		t, err := services.GenerateJWT(uid, email, name, tkv)
 		if err != nil {
 			log.Println("Login controller:: ", err)
-			response.SendServerError(c, err, nil)
+			response.SendServerError(c, err)
 			return
 		}
 
@@ -132,7 +132,7 @@ func UpdatePassword() gin.HandlerFunc {
 		// send response
 		response.SendJSON(c, gin.H{
 			"message": "Password updated successfully",
-		}, nil)
+		})
 
 	}
 }
