@@ -79,3 +79,60 @@ func InternalRateLimiter() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func ExternalRateLimiter() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Rate limit based on uid
+		uid := c.GetString("uid")
+
+		// Counter key per user per window
+		l, err := strconv.Atoi(env.GetEnvKey("RL__EXIT_LIMIT"))
+		if err != nil {
+			response.SendServerError(c, fmt.Errorf("invalid RL_LIMIT: %v", l))
+			c.Abort()
+			return
+		}
+		w, err := strconv.Atoi(env.GetEnvKey("RL_EXT_WINDOW"))
+		if err != nil {
+			response.SendServerError(c, fmt.Errorf("invalid RL_LIMIT: %v", w))
+			c.Abort()
+			return
+		}
+
+		cntr_key := fmt.Sprintf("ratelimit:ext:counter:%s", uid)
+
+		// Get current count
+		cntr, err := rdb.RC.GetInt(cntr_key)
+		if err != nil && err.Error() != "redis: nil" {
+			fmt.Println("RateLimiter Redis error: ", err)
+			response.SendServerError(c, err)
+			c.Abort()
+			return
+		}
+
+		fmt.Println("check ", cntr, l)
+		if cntr >= l {
+			c.Header("Retry-After", strconv.Itoa(w))
+			response.SendStatus(c, http.StatusTooManyRequests)
+			c.Abort()
+			return
+		}
+
+		// Increment or set count
+		if cntr == 0 {
+			// New key – set with expiry
+			expiry := time.Duration(w) * time.Second
+			err = rdb.RC.Set(cntr_key, 1, &expiry)
+		} else {
+			// Increment – preserve expiry
+			err = rdb.RC.Set(cntr_key, cntr+1, nil) // 0 = no expiry reset
+		}
+		if err != nil {
+			fmt.Println("RateLimiter SET error: ", err)
+			response.SendServerError(c, err)
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
