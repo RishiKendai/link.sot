@@ -1,5 +1,6 @@
 // context/AuthContext.tsx
 import { createContext, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export interface User {
     name: string;
@@ -32,8 +33,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     credentials: 'include',
                 });
 
+                const responseData = await res.json();
                 if (res.ok) {
-                    const responseData = await res.json();
                     const { data } = responseData;
                     console.log('authenticated', data);
                     setAuthenticated(true);
@@ -41,6 +42,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     if (window.location.pathname === '/') {
                         window.history.pushState({}, '', '/links')
                     }
+                } else if (res.status === 401 && responseData.error === 'session_expired') {
+                    toast.error("Your session has expired.");
+                    setTimeout(() => {
+                        setAuthenticated(false);
+                        setUser(null);
+                        window.location.href = '/';
+                    }, 1000)
                 } else {
                     setAuthenticated(false);
                     setUser(null);
