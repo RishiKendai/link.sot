@@ -37,6 +37,17 @@ func UpdateOne(query string, args ...interface{}) (sql.Result, error) {
 	return stmt.Exec(args...)
 }
 
+// UpdateOneReturning updates a record and returns the updated row
+func UpdateOneReturning(query string, args ...interface{}) (*sql.Row, error) {
+	stmt, err := DB.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	return stmt.QueryRow(args...), nil
+}
+
 // DeleteOne deletes a record from a table
 func DeleteOne(query string, args ...interface{}) (sql.Result, error) {
 	stmt, err := DB.Prepare(query)
