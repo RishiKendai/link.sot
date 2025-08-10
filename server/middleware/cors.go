@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/RishiKendai/sot/pkg/config/env"
@@ -10,19 +11,7 @@ import (
 var allowedOrigins = strings.Split(env.GetEnvKey("CORS_DOMAINS"), ",")
 
 func isAllowedOrigin(origin string) bool {
-	for _, allowedOrigin := range allowedOrigins {
-		if allowedOrigin == origin {
-			return true
-		}
-		// Handle wildcard patterns for VS Code port forwarding
-		// if strings.Contains(allowedOrigin, "*") {
-		// 	pattern := strings.ReplaceAll(allowedOrigin, "*", "")
-		// 	if strings.Contains(origin, pattern) {
-		// 		return true
-		// 	}
-		// }
-	}
-	return false
+	return slices.Contains(allowedOrigins, origin)
 }
 
 func CORSMiddleware() gin.HandlerFunc {
