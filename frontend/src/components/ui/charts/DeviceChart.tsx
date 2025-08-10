@@ -8,6 +8,7 @@ import {
   CategoryScale,
   LinearScale,
 } from 'chart.js';
+import IconDevice from '../icons/IconDevice';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale);
 
@@ -66,14 +67,52 @@ const DeviceChart: React.FC<DeviceChartProps> = ({ deviceStats }) => {
     },
   };
 
+  const hasData = Object.keys(deviceStats).length > 0 && Object.values(deviceStats).some(value => value > 0);
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 w-full">
       <h3 className="text-lg font-semibold mb-4">Device Distribution</h3>
       <div className="h-64">
-        <Pie data={data} options={options} />
+        {hasData ? (
+          <Pie data={data} options={options} />
+        ) : (
+          <EmptyState />
+        )}
       </div>
     </div>
   );
 };
+
+const EmptyState: React.FC = () => {
+  return (
+    <div className='flex flex-col items-center justify-center h-full py-8'>
+      <div className='flex flex-col items-center justify-center space-y-4'>
+        <div className='relative'>
+          <div className='w-16 h-16 bg-gradient-to-br from-purple-50 to-violet-100 rounded-full flex items-center justify-center'>
+            <IconDevice 
+              size={32} 
+              color='#7c3aed' 
+              strokeWidth={1.5}
+            />
+          </div>
+          <div className='absolute -top-1 -right-1 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center'>
+            <div className='w-3 h-3 bg-gray-400 rounded-full'></div>
+          </div>
+        </div>
+        <div className='text-center space-y-2'>
+          <h4 className='text-lg font-semibold text-gray-700'>No Device Data</h4>
+          <p className='text-sm text-gray-500 max-w-xs'>
+            Device usage statistics will appear here when visitors access your links
+          </p>
+        </div>
+        <div className='flex items-center space-x-2 text-xs text-gray-400'>
+          <div className='w-2 h-2 bg-gray-300 rounded-full'></div>
+          <span>Desktop, Mobile, Tablet, and more</span>
+          <div className='w-2 h-2 bg-gray-300 rounded-full'></div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default DeviceChart; 
