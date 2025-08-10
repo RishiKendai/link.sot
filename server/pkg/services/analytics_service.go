@@ -311,7 +311,7 @@ func getGeoLocation(ip string) *GeoLocation {
 		}
 
 		if err := json.Unmarshal(body, &geo); err != nil {
-			fmt.Printf("Error unmarshalling geo location: %v\n", err)
+			fmt.Printf("Error unMarshalling geo location: %v\n", err)
 			return geo
 		}
 	}

@@ -65,7 +65,7 @@ func Authenticate() gin.HandlerFunc {
 		jt, err := c.Cookie("token")
 
 		if err != nil || jt == "" {
-			fmt.Println("err jt", err)
+			fmt.Println("err::", err)
 			response.SendUnAuthorizedError(c, "Unauthorized")
 			return
 		}

@@ -20,13 +20,14 @@ func GetCollection(client *mongo.Client, collectionName string) *mongo.Collectio
 
 func ListCollections() {
 	client, _ := DB.Database(Database).ListCollectionNames(context.TODO(), bson.M{})
-	fmt.Printf("%+v ", client)
+	for _, collection := range client {
+		fmt.Println(collection)
+	}
 }
 
 func InsertOne(collection string, document interface{}) error {
 	collectionCtx := DB.Database(Database).Collection(collection)
-	data, err := collectionCtx.InsertOne(context.TODO(), document)
-	fmt.Println("data ", data)
+	_, err := collectionCtx.InsertOne(context.TODO(), document)
 	return err
 }
 

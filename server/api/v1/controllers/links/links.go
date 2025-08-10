@@ -49,7 +49,6 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		isCustomBackoff := false
 		if sc == "" {
 			counterVal := counter.NextCounter()
-			fmt.Println("Counter: ", counterVal)
 			sc = encodeBase62Fixed(counterVal, 7)
 		} else {
 			isCustomBackoff = true
@@ -191,7 +190,6 @@ func RedirectHandler() gin.HandlerFunc {
 		referrer := c.Request.Header.Get("Referer")
 		services.PushAnalytics(sot, ip, ua, isQR, referrer)
 
-		fmt.Println("Link: ", link.Original_url)
 		c.Header("Cache-Control", fmt.Sprintf("private, max-age=%d", 5*60))
 		c.Header("Content-Security-Policy", "referer always;")
 		c.Header("Referrer-Policy", "unsafe-url")
@@ -204,7 +202,6 @@ func RedirectHandler() gin.HandlerFunc {
 func GetLinksHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uid := c.GetString("uid")
-		fmt.Println("UID: ", uid)
 
 		// Pagination params
 		page := 1
@@ -500,7 +497,6 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		if expiry.IsZero() {
 			expiry = existingLink.Expiry_date.UTC()
 		} else {
-			fmt.Println("Expiry: ", expiry)
 			expiry = expiry.UTC()
 		}
 
@@ -638,7 +634,6 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 		}
 
 		// Verify password
-		fmt.Println("Password: ", *link.Password, payload.Password)
 		if *link.Password != payload.Password {
 			// response.SendBadRequestError(c, "Incorrect password")
 			response.ServeHTML(c, 401, "link_password.html", bson.M{
@@ -664,7 +659,6 @@ func VerifyPasswordHandler() gin.HandlerFunc {
 		referrer := c.Request.Header.Get("Referer")
 		services.PushAnalytics(sot, ip, ua, isQR, referrer)
 
-		fmt.Println("Link: ", link.Original_url)
 		c.Header("Cache-Control", fmt.Sprintf("private, max-age=%d", 5*60))
 		c.Header("Content-Security-Policy", "referer always;")
 		c.Header("Referrer-Policy", "unsafe-url")

@@ -3,7 +3,6 @@ package settings
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
@@ -84,7 +83,6 @@ func GetAPIKeys() gin.HandlerFunc {
 			return
 		}
 		keys := []api.APIKey{}
-		fmt.Println("uid", uid)
 		apiKeysDoc, err := mongodb.FindMany("api_keys", bson.M{"uid": uid})
 		if err != nil {
 			response.SendServerError(c, err)
@@ -96,7 +94,6 @@ func GetAPIKeys() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Printf("keys: %v\n", keys)
 		response.SendJSON(c, gin.H{
 			"api_keys": keys,
 		})

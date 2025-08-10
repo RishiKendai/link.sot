@@ -46,13 +46,11 @@ func InternalRateLimiter() gin.HandlerFunc {
 		// Get current count
 		cntr, err := rdb.RC.GetInt(cntr_key)
 		if err != nil && err.Error() != "redis: nil" {
-			fmt.Println("RateLimiter Redis error: ", err)
 			response.SendServerError(c, err)
 			c.Abort()
 			return
 		}
 
-		fmt.Println("check ", cntr, l)
 		if cntr >= l {
 			c.Header("Retry-After", strconv.Itoa(w))
 			response.SendStatus(c, http.StatusTooManyRequests)
@@ -110,7 +108,6 @@ func ExternalRateLimiter() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println("check ", cntr, l)
 		if cntr >= l {
 			c.Header("Retry-After", strconv.Itoa(w))
 			response.SendStatus(c, http.StatusTooManyRequests)

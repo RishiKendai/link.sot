@@ -53,7 +53,6 @@ func fetchDashboardData(uid string) DashboardStruct {
 		row, _ := postgres.FindOne(query, uid)
 		var count DashboardCount
 		row.Scan(&count.TotalClicks, &count.TotalQrClicks, &count.DirectClicks, &count.UniqueVisitors)
-		fmt.Printf("Row get totals>>> : %v\n", count)
 		totalClicksCh <- count
 	}()
 
@@ -175,7 +174,6 @@ func fetchDashboardData(uid string) DashboardStruct {
 		} else {
 			stats.Tags = []string{}
 		}
-		fmt.Printf("Row get stats>>> : %v\n", stats)
 		recentLinkStatsCh <- stats
 	}()
 
@@ -189,7 +187,6 @@ func fetchDashboardData(uid string) DashboardStruct {
 	dashboard.DirectClicks = count.DirectClicks
 	dashboard.UniqueVisitors = count.UniqueVisitors
 	stats := <-recentLinkStatsCh
-	fmt.Printf("Stats: %v\n", stats)
 	dashboard.Stats = stats
 
 	return dashboard

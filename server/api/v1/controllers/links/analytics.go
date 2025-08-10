@@ -134,7 +134,6 @@ func fetchLinkAnalytics(shortLink string) LinkAnalytics {
 			mu.Unlock()
 			return
 		}
-		fmt.Println(lastClickedAt, lastClickBrowser, lastClickDevice, lastClickFrom)
 		lcsCh <- struct {
 			LastClickedAt    time.Time
 			LastClickBrowser string

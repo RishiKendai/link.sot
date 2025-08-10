@@ -185,7 +185,6 @@ func IsAliasAvailable(alias string, excludeShortLink string) (bool, error) {
 func generateToken(shortCode string) string {
 	secret := os.Getenv("JWT_SECRET")
 	expiry := uint32(time.Now().Add(1 * time.Minute).Unix())
-	fmt.Println("Expiry: ", expiry)
 
 	// HMAC(secret, shortCode|expiry)
 	mac := hmac.New(sha256.New, []byte(secret))
@@ -199,14 +198,12 @@ func generateToken(shortCode string) string {
 	copy(buf[4:], sig)
 
 	packed := binary.BigEndian.Uint64(buf)
-	fmt.Println("Packed before: ", packed)
 	return base62Encode(packed)
 }
 
 func verifyToken(token string, shortCode string) (bool, error) {
 	secret := []byte(os.Getenv("JWT_SECRET"))
 	packed := base62Decode(token)
-	fmt.Println("Packed after: ", packed)
 
 	// Convert back to 8-byte buffer
 	buf := make([]byte, 8)
@@ -215,8 +212,6 @@ func verifyToken(token string, shortCode string) (bool, error) {
 	expiry := binary.BigEndian.Uint32(buf[0:4])
 	sig := buf[4:]
 
-	fmt.Println("Expiry: ", time.Unix(int64(expiry), 0))
-	fmt.Println("Time: ", time.Now())
 	if time.Now().After(time.Unix(int64(expiry), 0)) {
 		return false, errors.New("token expired")
 	}
@@ -226,8 +221,6 @@ func verifyToken(token string, shortCode string) (bool, error) {
 	mac.Write([]byte(shortCode))
 	mac.Write([]byte(fmt.Sprintf("%d", expiry)))
 	expectedSig := mac.Sum(nil)[:4]
-	fmt.Println("Expected Sig: ", expectedSig)
-	fmt.Println("Sig: ", sig)
 
 	return hmac.Equal(sig, expectedSig), nil
 }
