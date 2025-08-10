@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	apiV1 "github.com/RishiKendai/sot/api/v1"
 	routes "github.com/RishiKendai/sot/api/v1/routes"
@@ -13,6 +14,7 @@ import (
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 	rdb "github.com/RishiKendai/sot/pkg/database/redis"
 	"github.com/RishiKendai/sot/service/counter"
+	"github.com/RishiKendai/sot/service/cron"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,7 +29,7 @@ func main() {
 	port := env.EnvPort()
 
 	// Start analytics cron service in background
-	// go cron.RunWithInterval(8 * time.Second)
+	go cron.RunWithInterval(8 * time.Second)
 	fmt.Println("Cron service started")
 
 	router := gin.Default()
