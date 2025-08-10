@@ -3,9 +3,11 @@ package auth
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/RishiKendai/sot/api/v1/controllers/links"
 	"github.com/RishiKendai/sot/pkg/config/response"
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 	"github.com/RishiKendai/sot/pkg/services"
@@ -75,7 +77,6 @@ func Login() gin.HandlerFunc {
 			response.SendServerError(c, err)
 			return
 		}
-
 		// c.SetCookie("token", token, 60*60*24, "/", "", false, true)
 		http.SetCookie(c.Writer, &http.Cookie{
 			Name:     "token",
@@ -87,6 +88,29 @@ func Login() gin.HandlerFunc {
 			// SameSite: http.SameSiteLaxMode,
 			SameSite: http.SameSiteNoneMode,
 		})
+
+		// check query-params
+		action := c.Query("action")
+
+		if action == "shorten" {
+			l := c.Query("hero_link")
+			sc, err := links.QuickShortURL(uid, l)
+			if err != nil {
+				response.SendBadRequestError(c, err.Error())
+				return
+			}
+			redirect_to := c.Query("redirect_to")
+			if redirect_to == "link_details" {
+				redirect_to = fmt.Sprintf("/links/%s/details", sc)
+				response.SendJSON(c, gin.H{
+					"email":       email,
+					"name":        name,
+					"redirect_to": redirect_to,
+				})
+				return
+			}
+		}
+
 		response.SendJSON(c, gin.H{
 			"email": email,
 			"name":  name,

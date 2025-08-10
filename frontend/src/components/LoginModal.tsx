@@ -5,23 +5,25 @@ import TextBox from './ui/inputs/TextBox';
 import { validateField } from '../utils/validation';
 import { useApiMutation } from '../hooks/useApiMutation';
 import Alert, { type AlertProps } from './ui/Alert';
-import Loader from './ui/Loader';
 import { useAuth } from '../context/UseAuth';
 
 import { useNavigate } from 'react-router-dom';
+import Button from './ui/button/Button';
 
 type modalState = 'login' | 'register' | null
 
 interface LoginProps {
     handleModal: (state: modalState) => void
+    heroLink: string
 }
 
 interface LoginResponse {
     name: string;
     email: string;
+    redirect_to?: string;
 }
 
-function Login({ handleModal }: LoginProps) {
+function Login({ handleModal, heroLink }: LoginProps) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -33,7 +35,7 @@ function Login({ handleModal }: LoginProps) {
     const { setUser } = useAuth();
 
 
-    const loginMutation = useApiMutation<{ email: string; password: string; }, LoginResponse>(['login'])
+    const loginMutation = useApiMutation<{ email: string; password: string }, LoginResponse>(['login'])
     const { isPending } = loginMutation
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -58,32 +60,36 @@ function Login({ handleModal }: LoginProps) {
         const isEmailValid = validateField({ name: 'email', value: email, type: 'email', setError: setFormError })
         const isPasswordValid = validateField({ name: 'password', value: password, type: 'password', setError: setFormError })
         if (!isEmailValid || !isPasswordValid) return;
+        let path = '/login'
+        if (heroLink) {
+            const encodedURL = encodeURIComponent(heroLink)
+            path = `/login?action=shorten&redirect_to=link_details&hero_link=${encodedURL}`
+        }
         loginMutation.mutate({
-            path: '/login',
+            path,
             method: 'POST',
             payload: { email, password }
         }, {
             onSuccess: (data) => {
-                console.log('data :::: ', data)
                 if (data && data.status === 'success' && data.data) {
                     setUser({ name: data.data.name, email: data.data.email })
-                    return navigate('/links')
+                    if (data.data.redirect_to)
+                        return navigate(data.data.redirect_to, { state: { status: 'CREATED' }, replace: true })
+                    return navigate('/dashboard', { replace: true })
                 }
-                console.log('check ', data)
                 if (data && data.status === 'error') {
-                    console.log('data.error :::: ', data.error)
+                    console.error('data.error :::: ', data.error)
                     setAlert({ type: 'danger', message: data.error as string })
                     return;
                 }
                 if (data && data.status === 'unknown_error') {
-                    console.log('data.error :::: ', data.error)
+                    console.error('data.error :::: ', data.error)
                     setAlert(null)
                     return;
                 }
             },
             onError: () => {
-                console.log('in error')
-                console.log('error :::: ', loginMutation)
+                console.error('error :::: ', loginMutation)
             }
         })
     }
@@ -98,11 +104,6 @@ function Login({ handleModal }: LoginProps) {
                         </svg>
                     </button>
                     <div className='text-3xl font-bold txt-gradient mb-6 text-center'>Welcome back!</div>
-                    <div className="relative flex items-center justify-center py-4">
-                        <div className="w-full border-t border-gray-300"></div>
-                        <span className="px-3 bg-white text-gray-500 text-sm">OR</span>
-                        <div className="w-full border-t border-gray-300"></div>
-                    </div>
                     <form onSubmit={handleLogin} noValidate >
                         {/* Email */}
                         <TextBox
@@ -128,13 +129,7 @@ function Login({ handleModal }: LoginProps) {
                             postfixIcon={PostfixIconMemo}
                         />
                         {alert && <Alert type={alert.type} message={alert.message} className='mb-6' />}
-                        <button disabled={isPending} type="submit" className="w-full h-10 rounded text-lg leading-tight btn btn-animate bg-black  cursor-pointer">
-                            {
-                                isPending
-                                    ? <Loader className=' h-6 black w-6' />
-                                    : <span className="text-white font-bold text-md">Login</span>
-                            }
-                        </button>
+                        <Button type='submit' label='Login' className='gsbb w-full mt-4' isPending={isPending} />
                     </form>
                     <p className="text-center text-sm text-gray-600 mt-6">
                         Don't have an account? <a href="#" className="text-purple-600 hover:text-purple-800 font-medium" onClick={() => handleModal('register')}>Register</a>

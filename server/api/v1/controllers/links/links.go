@@ -3,6 +3,7 @@ package links
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -92,6 +93,32 @@ func CreateShortURLHandler() gin.HandlerFunc {
 			"short_code": sc,
 		})
 	}
+}
+
+func QuickShortURL(uid, l string) (string, error) {
+	if l == "" {
+		return "", errors.New("URL is required")
+	}
+
+	exp_date := time.Now().Add(30 * 24 * time.Hour).UTC()
+	counterVal := counter.NextCounter()
+	sc := encodeBase62Fixed(counterVal, 7)
+
+	// Prepare query and args for optional fields
+	query := "INSERT INTO links (user_uid, original_link, short_link, expiry_date, password, scan_link, is_flagged, is_custom_backoff, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
+	r, err := postgres.InsertOne(query, uid, l, sc, exp_date, sql.NullString{}, false, false, false, []string{})
+	if err != nil {
+		log.Println("Error: ", err)
+		return "", errors.New("error creating link")
+	}
+	if r.Err() != nil {
+		log.Println("Error: ", r.Err())
+		return "", errors.New("error creating link")
+	}
+	// Set Redis with default expiry of 5 hours
+	duration := time.Hour * 5
+	rdb.RC.Set(sc, l, &duration)
+	return sc, nil
 }
 
 func CheckAliasAvailabilityHandler() gin.HandlerFunc {

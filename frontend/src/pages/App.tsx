@@ -9,6 +9,7 @@ import IconLink from '../components/ui/icons/IconLink'
 import IconAnalytics from '../components/ui/icons/IconAnalytics'
 import IconShield from '../components/ui/icons/IconShield'
 import TextBox from '../components/ui/inputs/TextBox'
+import Button from '../components/ui/button/Button'
 
 const features = [
   {
@@ -39,6 +40,8 @@ function App() {
 
   const [modalOpen, setModalOpen] = useState<modalState>(null)
   const [heroLink, setHeroLink] = useState<string>('')
+  const [error, setError] = useState<Record<string, string>>({})
+
   const handleModal = (state: modalState) => {
     if (state === 'login') {
       setModalOpen('login')
@@ -47,19 +50,33 @@ function App() {
     } else {
       setModalOpen(null)
     }
+  }
 
+  const ShortenLink = () => {
+    if (!heroLink) {
+      setError(prev => ({
+        ...prev,
+        heroLink: 'Please enter a link to shorten.'
+      }))
+      return
+    }
+    setError(prev => ({
+      ...prev,
+      heroLink: ''
+    }))
+    handleModal('register')
   }
 
   return (
     <>
-      {modalOpen === 'login' && <LoginModal handleModal={handleModal} />}
-      {modalOpen === 'register' && <RegisterModal handleModal={handleModal} />}
+      {modalOpen === 'login' && <LoginModal handleModal={handleModal} heroLink={heroLink} />}
+      {modalOpen === 'register' && <RegisterModal handleModal={handleModal} heroLink={heroLink} />}
 
       <div className='flex w-full min-h-dvh flex-col justify-center'>
         <Header handleModal={handleModal} />
         {/* Hero Section */}
-        <section className='flex flex-col pt-28 pb-20 px-2 items-center justify-center text-center relative min-h-screen-75'>
-          <div className='mx-auto'>
+        <section className='flex flex-col pt-28 pb-20 px-2 items-center justify-center relative min-h-screen-75'>
+          <div className='mx-auto text-center'>
             <h1 className='text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6'>
               <span className="txt-gradient">Shorten. Track. Elevate.</span>
               <br className="hidden sm:block" />
@@ -69,8 +86,8 @@ function App() {
             </p>
           </div>
           {/* Quick shorten Input */}
-          <div className='mx-auto text-center'>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Try it now!</h3>
+          <div className='mx-auto'>
+            <h3 className="text-lg text-center font-semibold text-gray-800 mb-4">Try it now!</h3>
             <div className='flex flex-col sm:flex-row gap-4'>
               <TextBox
                 id='heroShortenInput'
@@ -80,8 +97,9 @@ function App() {
                 type='url'
                 onChange={(e) => setHeroLink(e.target.value)}
                 value={heroLink}
+                error={error.heroLink}
               />
-              <button className='cursor-pointer btn btn-animate text-lg w-full sm:w-auto font-semibold gpb'><span className='text-white'>Shorten</span></button>
+              <Button label='Shorten' className='gpb self-start text-xl' onClick={ShortenLink} />
             </div>
           </div>
         </section>
@@ -116,14 +134,18 @@ function App() {
         </section>
         {/* Call to Action Section */}
         <section className="pb-16 sm:px-6 text-center">
-          <div className="max-w-4xl mx-auto polished-card p-8 md:p-16">
+          <div className="max-w-4xl mx-auto p-8 md:p-16">
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
               Ready to Unleash the Power of Your Links?
             </h2>
             <p className="text-lg md:text-xl text-gray-700 mb-10 max-w-2xl mx-auto">
               Say goodbye to basic links. With  LinkSot, you get real-time insights, smart targeting, and effortless control — right out of the box.
             </p>
-            <button className="gpb btn-animate px-10 py-5 text-xl font-bold rounded-xl shadow-lg hover:shadow-xl">
+            <button onClick={() => {
+              setHeroLink('')
+              setError({})
+              handleModal('register')
+            }} className="gpb btn-animate px-10 py-5 text-xl font-bold rounded-xl shadow-lg hover:shadow-xl">
               <span className="text-white">Start Your  LinkSot Journey Free</span>
             </button>
           </div>
