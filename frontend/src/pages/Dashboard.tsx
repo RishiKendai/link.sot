@@ -1,27 +1,28 @@
-import React from 'react'
-import Button from '../components/ui/button/Button'
-import './dashboard.css'
-
+import React, { useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
+import clsx from 'clsx'
 
-
+import Button from '../components/ui/button/Button'
 import { useApiQuery } from '../hooks/useApiQuery'
-import { useEffect } from 'react'
 import { useAuth } from '../context/UseAuth'
+
 import IconClick from '../components/ui/icons/IconClick'
 import type { IconBaseProps } from '../components/ui/icons/IconBase'
-import clsx from 'clsx'
 import IconQrCode from '../components/ui/icons/IconQrCode'
 import IconUser from '../components/ui/icons/IconUser'
-import LinkCard from '../components/LinkCard'
 import IconGlobe from '../components/ui/icons/IconGlobe'
 import IconArrowNarrowRight from '../components/ui/icons/IconArrowNarrowRight'
 import IconMapPin from '../components/ui/icons/IconMapPin'
 import IconCalendar from '../components/ui/icons/IconCalendar'
 import IconDevice from '../components/ui/icons/IconDevice'
-import IconCustomDomain from '../components/ui/icons/IconCustomDomain'
-import IconAPIIntegration from '../components/ui/icons/IconAPIIntegration'
 import IconGlobeWWW from '../components/ui/icons/IconGlobeWWW'
+
+import './dashboard.css'
+
+// Lazy-loaded
+const IconCustomDomain = React.lazy(() => import('../components/ui/icons/IconCustomDomain'));
+const IconAPIIntegration = React.lazy(() => import('../components/ui/icons/IconAPIIntegration'));
+const LinkCard = React.lazy(() => import('../components/LinkCard'));
 
 type DashboardData = {
   total_clicks: number;

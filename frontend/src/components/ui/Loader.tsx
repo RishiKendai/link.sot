@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import './Loader.css'
+import './loader.css'
 
 type LoaderProps = {
     className?: string

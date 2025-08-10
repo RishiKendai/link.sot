@@ -49,33 +49,11 @@ const ChipInput: React.FC<ChipInputProps> = ({
     const inputRef = useRef<HTMLInputElement>(null);
     const [chips, setChips] = useState<string[]>(initialValues.map(v => v.trim()).filter(Boolean));
     const [inputValue, setInputValue] = useState('');
-    // const [isInitialized, setIsInitialized] = useState(false);
-    // const [hasInitialized, setHasInitialized] = useState(false);
 
     // Only update chips from initialValues on the very first render
     useEffect(() => {
-        // if (!hasInitialized) {
-        const chipsList = initialValues.map(v => v.trim()).filter(Boolean);
-        setChips(chipsList);
-        // setHasInitialized(true);
-        // }
+        setChips(initialValues.map(v => v.trim()).filter(Boolean));
     }, [initialValues]);
-
-    // if (initialValues.length > 0) {
-    //     setChips(initialValues.map(v => v.trim()).filter(Boolean));
-    // }
-    // Mark as initialized after first render
-    // useEffect(() => {
-    //     if (!isInitialized) {
-    //         setIsInitialized(true);
-    //     }
-    // }, [isInitialized]);
-
-    // useEffect(() => {
-    //     if (isInitialized) {
-    //         onValuesChange?.(chips);
-    //     }
-    // }, [chips, onValuesChange, isInitialized]);
 
     const addChip = (value: string) => {
         const trimmed = value.trim();
@@ -90,14 +68,6 @@ const ChipInput: React.FC<ChipInputProps> = ({
         setInputValue('');
     };
 
-    // const addChip = useCallback((value: string) => {
-    //     const trimmed = value.trim();
-    //     if (!trimmed || chips.includes(trimmed)) return;
-    //     if (maxChips && chips.length >= maxChips) return;
-
-    //     setChips(prev => [...prev, trimmed]);
-    //     setInputValue('');
-    // }, [chips, maxChips]);
 
     const removeChip = (value: string) => {
         setChips(prev => {

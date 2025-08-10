@@ -10,6 +10,7 @@ import { useApiMutation } from '../../hooks/useApiMutation'
 import { useNavigate } from 'react-router-dom'
 import Alert from '../../components/ui/Alert'
 import { useQueryClient } from '@tanstack/react-query'
+import { validateField } from '../../utils/validation'
 
 const LinkCreate = () => {
     const [url, setUrl] = useState('')
@@ -19,6 +20,7 @@ const LinkCreate = () => {
     const [scanLink, setScanLink] = useState(false)
     const [password, setPassword] = useState('')
     const [tags, setTags] = useState<string[]>([])
+    const [formError, setFormError] = useState<Record<string, string>>({})
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -41,6 +43,9 @@ const LinkCreate = () => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const originalURL = validateField({ name: 'url', value: url, type: 'url', setError: setFormError })
+        if (!originalURL) return;
+        setFormError({});
         setError('');
         createLink({
             path: '/links',
@@ -88,6 +93,7 @@ const LinkCreate = () => {
                                 placeholder='https://www.example.com'
                                 id='url'
                                 value={url}
+                                error={formError.url}
                                 onChange={(e) => setUrl(e.target.value)}
                             />
                         </div>
