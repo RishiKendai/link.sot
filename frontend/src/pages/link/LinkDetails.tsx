@@ -26,7 +26,7 @@ const LinkDetails: React.FC = () => {
     const location = useLocation()
     const navigate = useNavigate()
 
-    const status = location.state?.status || 'NONE'
+    const status = location.state?.status || 'CREATED'
 
     const [link, setLink] = useState<Link | null>(null)
 

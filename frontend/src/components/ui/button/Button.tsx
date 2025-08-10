@@ -32,7 +32,7 @@ const Button = ({
       autoFocus={autoFocus}
       type={type} 
       disabled={isPending || disabled} 
-      className={`rounded w-fit btn cursor-pointer relative ${className} ${variant}`} 
+      className={`rounded-xs text-sm w-fit btn cursor-pointer relative ${className} ${variant}`} 
       onClick={onClick}
       style={{ minWidth: 'fit-content' }}
     >

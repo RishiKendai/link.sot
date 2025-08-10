@@ -54,7 +54,7 @@ const TextBox: React.FC<TextBoxProps> = ({
             </label>}
 
             <div className={clsx(
-                'input-box mb-1',
+                'input-box',
                 {
                     'border-red-500 shadow-sm ring-1 ring-red-500': error,
                     'focus-within:border-[var(--clr-primary-invert)] ring-1 ring-transparent focus-within:ring-1 focus-within:ring-[var(--clr-primary-invert)]': !error
@@ -79,8 +79,8 @@ const TextBox: React.FC<TextBoxProps> = ({
                 {postfixIcon && postfixIcon}
             </div>
 
-            {error && <div className="text-sm text-red-600">{error}</div>}
-            {info && !error && <div className="text-xs text-gray-400">{info}</div>}
+            {error && <div className="mt-1 text-sm text-red-600">{error}</div>}
+            {info && !error && <div className="mt-1 text-xs text-gray-400">{info}</div>}
         </div >
     );
 };

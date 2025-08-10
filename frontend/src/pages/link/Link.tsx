@@ -33,7 +33,7 @@ type Link = {
     updated_at: Date;
 }
 
-// const gradientList = ['gpb', 'gct', 'gge', 'gor']
+const baseURL = import.meta.env.VITE_SOT_HOST
 
 const Link: React.FC = () => {
     const queryClient = useQueryClient()
@@ -264,7 +264,7 @@ const Link: React.FC = () => {
             <Modal isOpen={linkId !== ''} onClose={() => setLinkId('')}>
                 <form onSubmit={deleteLinkHandler}>
                     <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
-                    <p className="text-gray-600 mb-4">Are you sure you want to delete this short link?</p>
+                    <p className="text-gray-600 mb-4">Are you sure you want to delete <span className='font-semibold text-red-800'>{`${baseURL}/${linkId}`}</span>?</p>
                     <div className="flex justify-end">
                         <Button
                             variant='tertiary'

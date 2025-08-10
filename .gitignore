@@ -2,6 +2,9 @@
 .env.local
 tmp
 
+# todo
+todo.txt
+
 # Logs
 logs
 *.log
