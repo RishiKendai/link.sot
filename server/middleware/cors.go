@@ -3,18 +3,11 @@ package middleware
 import (
 	"strings"
 
+	"github.com/RishiKendai/sot/pkg/config/env"
 	"github.com/gin-gonic/gin"
 )
 
-var allowedOrigins = []string{
-	"http://localhost:5173",
-	"https://c5t64pql-5173.inc1.devtunnels.ms",
-	"https://*.devtunnels.ms",
-	"https://*.inc1.devtunnels.ms",
-	// Add more VS Code port forwarding patterns
-	"https://c5t64pql.inc1.devtunnels.ms:5173",
-	"https://c5t64pql-5173.inc1.devtunnels.ms:5173",
-}
+var allowedOrigins = strings.Split(env.GetEnvKey("CORS_DOMAINS"), ",")
 
 func isAllowedOrigin(origin string) bool {
 	for _, allowedOrigin := range allowedOrigins {
@@ -22,12 +15,12 @@ func isAllowedOrigin(origin string) bool {
 			return true
 		}
 		// Handle wildcard patterns for VS Code port forwarding
-		if strings.Contains(allowedOrigin, "*") {
-			pattern := strings.ReplaceAll(allowedOrigin, "*", "")
-			if strings.Contains(origin, pattern) {
-				return true
-			}
-		}
+		// if strings.Contains(allowedOrigin, "*") {
+		// 	pattern := strings.ReplaceAll(allowedOrigin, "*", "")
+		// 	if strings.Contains(origin, pattern) {
+		// 		return true
+		// 	}
+		// }
 	}
 	return false
 }
@@ -48,11 +41,6 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Strict-Origin-When-Cross-Origin", "true")
 		c.Writer.Header().Set("Access-Control-Expose-Headers", "Location")
-
-		// if c.Request.Method == "OPTIONS" {
-		// 	c.AbortWithStatus(204)
-		// 	return
-		// }
 
 		c.Next()
 	}
