@@ -53,8 +53,8 @@ const getInitials = (name: string) => {
   if (!name) return "";
   const parts = name.trim().split(/\s+/);
   return parts.length === 1
-    ? name[0] + name[name.length - 1]
-    : parts[0][0] + parts[1][0];
+    ? (name[0] + name[name.length - 1]).toLocaleUpperCase()
+    : (parts[0][0] + parts[1][0]).toLocaleUpperCase();
 };
 
 const Sidebar: React.FC = () => {
@@ -194,7 +194,7 @@ const Sidebar: React.FC = () => {
               <div className="w-10 h-10 rounded-xl flex items-center justify-center">
                 <img height={28} width={28} src='/logo.svg' alt='logo' />
               </div>
-              <span className="ml-2 text-2xl font-extrabold txt-gradient gpb">LinkSwift</span>
+              <span className="ml-2 text-2xl font-extrabold txt-gradient gpb">LinkSot</span>
             </div>
           </div>
         )}
@@ -204,7 +204,7 @@ const Sidebar: React.FC = () => {
           ref={sidebarRef}
           className={`
           flex flex-col py-6 px-4 shadow-lg bg-white border-r border-gray-200
-          transition-all duration-300 ease-in-out z-50
+          transition-all duration-300 ease-in-out z-50 overflow-y-auto max-h-screen custom-scroll w-full
           ${
             // Mobile specific styles: fixed position, slide in/out
             isMobileScreen
@@ -262,78 +262,109 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             {(isSidebarExpanded || isMobileScreen) && ( // Show brand name if expanded or on mobile (when sidebar is open)
-              <span className="ml-2 text-3xl font-extrabold txt-gradient gpb">LinkSwift</span>
+              <span className="ml-2 text-3xl font-extrabold txt-gradient gpb">LinkSot</span>
             )}
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex-1">
+          <nav className="flex-1 mb-2">
             <ul className="space-y-2">
               {menuItems.map((item) => (
                 <li key={item.id} className="relative group"> {/* Added relative for tooltip positioning */}
-                  <Link
-                    to={item.link}
-                    className={`
-                    flex items-center rounded-xl py-2
-                    transition-all duration-200 ease-in-out
-                    ${activeItem === item.link ? 'bg-[var(--clr-secondary)]/80  text-white' : 'text-gray-800 hover:bg-gray-100 hover:text-gray-900'}
-                    ${isSidebarExpanded || isMobileScreen ? 'px-4 space-x-3' : 'justify-center px-1'}
-                  `}
-                    onClick={() => handleMenuItemClick(item.id)}
-                  >
-                    <span className={`${isSidebarExpanded || isMobileScreen ? '' : 'flex items-center justify-center w-full'} ${activeItem === item.link ? 'text-white' : 'text-gray-800'}`}>
-                      {item.icon}
-                    </span>
-                    {(isSidebarExpanded || isMobileScreen) && ( // Show label if expanded or on mobile (when sidebar is open)
+                  {!isSidebarExpanded && !isMobileScreen ? (
+                    <Tooltip text={item.label} dir='right'>
+                      <Link
+                        to={item.link}
+                        className={`
+                        flex items-center rounded-xl py-2
+                        transition-all duration-200 ease-in-out
+                        ${activeItem === item.link ? 'bg-[var(--clr-secondary)]/80  text-white' : 'text-gray-800 hover:bg-gray-100 hover:text-gray-900'}
+                        justify-center px-1
+                      `}
+                        onClick={() => handleMenuItemClick(item.id)}
+                      >
+                        <span className={`flex items-center justify-center w-full ${activeItem === item.link ? 'text-white' : 'text-gray-800'}`}>
+                          {item.icon}
+                        </span>
+                      </Link>
+                    </Tooltip>
+                  ) : (
+                    <Link
+                      to={item.link}
+                      className={`
+                      flex items-center rounded-xl py-2
+                      transition-all duration-200 ease-in-out
+                      ${activeItem === item.link ? 'bg-[var(--clr-secondary)]/80  text-white' : 'text-gray-800 hover:bg-gray-100 hover:text-gray-900'}
+                      px-4 space-x-3
+                    `}
+                      onClick={() => handleMenuItemClick(item.id)}
+                    >
+                      <span className={`${activeItem === item.link ? 'text-white' : 'text-gray-800'}`}>
+                        {item.icon}
+                      </span>
                       <span className={`font-medium ${activeItem === item.link ? 'text-white' : 'text-gray-800'}`}>
                         {item.label}
                       </span>
-                    )}
-                    {/* Tooltip for collapsed desktop sidebar */}
-                    {!isSidebarExpanded && !isMobileScreen && (
-                      <Tooltip text={item.label} dir='right' />
-                    )}
-                  </Link>
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
           </nav>
 
           {/* User Profile & Logout */}
-          <div className={`border-t border-gray-200 pt-6 mt-auto ${isSidebarExpanded || isMobileScreen ? '' : 'flex flex-col items-center'}`}>
-            <div className={`flex items-center mb-4 relative group ${isSidebarExpanded || isMobileScreen ? 'px-2' : 'justify-center flex-col space-y-2'}`}>
-              <div className="min-w-10 min-h-10 rounded-full gge flex items-center justify-center text-white font-bold text-base">
-                {getInitials(user?.name || '') || ''}
-              </div>
-              {(isSidebarExpanded || isMobileScreen) && ( // Show profile details if expanded or on mobile
+          <div className={`border-t border-gray-200 gap-4 pt-6 mt-auto ${isSidebarExpanded || isMobileScreen ? '' : 'flex flex-col items-center'}`}>
+            {!isSidebarExpanded && !isMobileScreen ? (
+              <Tooltip text={user?.name.toLocaleUpperCase() || ''} dir='right'>
+                <div className={`flex items-center justify-center flex-col space-y-2 cursor-default`}>
+                  <div className="min-w-10 min-h-10 rounded-full gge flex items-center justify-center text-white font-bold text-base">
+                    {getInitials(user?.name || '') || ''}
+                  </div>
+                </div>
+              </Tooltip>
+            ) : (
+                <div className={`flex items-center mb-4 px-2`}>
+                  <div className="min-w-10 min-h-10 rounded-full cursor-default gge flex items-center justify-center text-white font-bold text-base">
+                  {getInitials(user?.name || '') || ''}
+                </div>
                 <div className="ml-3">
-                  <p className="text-gray-900 font-medium text-sm">{user?.name}</p>
+                  <p className="text-gray-900 font-medium text-sm">{user?.name.toLocaleUpperCase()}</p>
                   <p className="text-gray-600 text-xs">{user?.email}</p>
                 </div>
-              )}
-              {/* Tooltip for collapsed desktop sidebar */}
-              {!isSidebarExpanded && !isMobileScreen && (
-                <Tooltip text={user?.name || ''} dir='right' />
-              )}
-            </div>
-            <button
-              className={`
-              flex items-center rounded-xl py-2 relative group
-              transition-all duration-200 ease-in-out w-full
-              ${isSidebarExpanded || isMobileScreen ? 'px-4 space-x-3' : 'justify-center px-1'}
-              text-red-600 hover:bg-red-50 hover:text-red-700
-            `}
-              onClick={() => handleMenuItemClick('logout')}
-            >
-              <span className={`${isSidebarExpanded || isMobileScreen ? '' : 'flex items-center justify-center w-full'}`}>
-                <IconLogout />
-              </span>
-              {(isSidebarExpanded || isMobileScreen) && <span className="font-medium">Logout</span>}
-              {/* Tooltip for collapsed desktop sidebar */}
-              {!isSidebarExpanded && !isMobileScreen && (
-                <Tooltip text='Logout' dir='right' />
-              )}
-            </button>
+              </div>
+            )}
+            {!isSidebarExpanded && !isMobileScreen ? (
+              <Tooltip text='Logout' dir='right'>
+                <button
+                  className={`
+                  flex items-center rounded-xl py-2
+                  transition-all duration-200 ease-in-out w-full
+                  justify-center px-2
+                  text-red-600 hover:bg-red-50 hover:text-red-700
+                `}
+                  onClick={() => handleMenuItemClick('logout')}
+                >
+                  <span className={`flex items-center justify-center w-full`}>
+                    <IconLogout />
+                  </span>
+                </button>
+              </Tooltip>
+            ) : (
+              <button
+                className={`
+                flex items-center rounded-xl py-2
+                transition-all duration-200 ease-in-out w-full
+                px-4 space-x-3
+                text-red-600 hover:bg-red-50 hover:text-red-700
+              `}
+                onClick={() => handleMenuItemClick('logout')}
+              >
+                <span className={``}>
+                  <IconLogout />
+                </span>
+                <span className="font-medium">Logout</span>
+              </button>
+            )}
           </div>
         </aside>
 

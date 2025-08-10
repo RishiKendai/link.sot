@@ -122,7 +122,6 @@ const LinkCreate = () => {
                     {/* Expiry date, password, and protection */}
                     <div className="card-group">
                         <div className="card-item">
-                            {/* <div className='grid grid-cols-2 gap-8'> */}
                             <div className='flex flex-col gap-8 relative'>
                                 <TextBox
                                     onClick={() => setShowCalendar(true)}
@@ -158,7 +157,6 @@ const LinkCreate = () => {
                                 />
                             </div>
                         </div>
-                        {/* </div> */}
 
                         {/* Tags */}
                         <div className="card-item">
@@ -183,7 +181,7 @@ const LinkCreate = () => {
 
                     {error && <Alert type='danger' message={error} className='mb-4' />}
                     <div className='flex w-full justify-end'>
-                        <Button className='text-sm mr-4' label='Cancel' type='button' variant='tertiary' />
+                        <Button className='text-sm mr-4' label='Cancel' type='button' variant='tertiary' onClick={() => navigate(-1)} />
                         <Button className='text-sm ' isPending={false} label='Shorten Link' type='submit' variant='primary' />
                     </div>
                 </div>

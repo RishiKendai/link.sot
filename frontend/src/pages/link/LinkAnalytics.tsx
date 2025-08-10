@@ -118,15 +118,17 @@ const LinkDetails: React.FC<{ link: LAnalyticType }> = ({ link }) => {
                 <div className='bg-gray-100 rounded-full py-2 px-4 flex items-center gap-2 min-w-0'>
                     {
                         link.is_password_protected ?
-                            <span className='text-green-600 bg-green-200 rounded-full p-2 flex relative group'>
-                                <IconShield size={20} />
-                                <Tooltip text='Protected by password' dir='top' />
-                            </span>
+                            <Tooltip text='Protected by password' dir='top'>
+                                <span className='text-green-600 bg-green-200 rounded-full p-2 flex'>
+                                    <IconShield size={20} />
+                                </span>
+                            </Tooltip>
                             :
-                            <span className='text-red-600 bg-red-100 rounded-full p-2 flex relative group'>
-                                <IconShieldOff size={20} />
-                                <Tooltip text='Public' dir='top' />
-                            </span>
+                            <Tooltip text='Public' dir='top'>
+                                <span className='text-red-600 bg-red-100 rounded-full p-2 flex'>
+                                    <IconShieldOff size={20} />
+                                </span>
+                            </Tooltip>
                     }
                     <span className='w-fit max-w-full truncate text-lg font-bold'>
                         {baseURL}/{link.short_link}

@@ -32,7 +32,7 @@ type LinkType = {
 
 type LinkProps = {
     link: LinkType;
-    setLinkId: React.Dispatch<React.SetStateAction<string>>;
+    setLinkId?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 
@@ -71,12 +71,12 @@ const LinkCard: React.FC<LinkProps> = ({ link, setLinkId }) => {
                                     <p className='text-blue-700 text-sm font-semibold'>View Analytics</p>
                                 </div>
                                 {/* expiry date */}
-                                <div className='flex items-center gap-1 relative group cursor-default'>
-                                    <IconExpiry size={18} className='text-gray-400' />
-                                    <p className='text-gray-400 text-sm font-medium'>{formatToHumanDate(link.expiry_date.toString())}</p>
-                                    {/* tooltip */}
-                                    <Tooltip text='Expires on' dir='top' />
-                                </div>
+                                <Tooltip text='Expires on' dir='top'>
+                                    <div className='flex items-center gap-1 cursor-default'>
+                                        <IconExpiry size={18} className='text-gray-400' />
+                                        <p className='text-gray-400 text-sm font-medium'>{formatToHumanDate(link.expiry_date.toString())}</p>
+                                    </div>
+                                </Tooltip>
                                 {/* is password protected */}
                                 <div className='flex items-center gap-1'>
                                     {link.password ? (
@@ -121,50 +121,52 @@ const LinkCard: React.FC<LinkProps> = ({ link, setLinkId }) => {
                     <div className="flex items-start gap-2 justify-end">
                         {/* Copy */}
                         {hide && !hide.includes('copy') &&
-                            <div
-                                className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200 relative group'
-                                onClick={() => {
-                                    navigator.clipboard.writeText(baseURL + '/' + link.short_link)
-                                    setCopiedLinkId(link.uid)
-                                    setTimeout(() => {
-                                        setCopiedLinkId(null)
-                                    }, 2000)
-                                }}
-                            >
-                                {copiedLinkId === link.uid ? (
-                                    <IconTick size={18} />
-                                ) : (
-                                    <IconCopy size={18} />
-                                )}
-                                {/* tooltip */}
-                                <Tooltip text='Copy' dir='bottom' />
-                            </div>
+                            <Tooltip text='Copy' dir='bottom'>
+                                <div
+                                    className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200'
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(baseURL + '/' + link.short_link)
+                                        setCopiedLinkId(link.uid)
+                                        setTimeout(() => {
+                                            setCopiedLinkId(null)
+                                        }, 2000)
+                                    }}
+                                >
+                                    {copiedLinkId === link.uid ? (
+                                        <IconTick size={18} />
+                                    ) : (
+                                        <IconCopy size={18} />
+                                    )}
+                                </div>
+                            </Tooltip>
                         }
                         {/* Edit */}
                         {hide && !hide.includes('edit') &&
-                            <div onClick={() => navigate(`/links/edit/${link.short_link}`)} className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200 relative group'>
-                                <IconEdit size={18} />
-                                <Tooltip text='Edit' dir='bottom' />
-                            </div>
+                            <Tooltip text='Edit' dir='bottom'>
+                                <div onClick={() => navigate(`/links/edit/${link.short_link}`)} className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200'>
+                                    <IconEdit size={18} />
+                                </div>
+                            </Tooltip>
                         }
                         {/* Delete */}
-                        {hide && !hide.includes('delete') &&
-                            <div onClick={() => setLinkId(link.uid)} className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-red-100 border border-red-200 relative group'>
-                                <IconDelete size={18} color='red' />
-                                <Tooltip text='Delete' dir='bottom' />
-                            </div>
+                        {hide && !hide.includes('delete') && setLinkId &&
+                            <Tooltip text='Delete' dir='bottom'>
+                                <div onClick={() => setLinkId(link.uid)} className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-red-100 border border-red-200'>
+                                    <IconDelete size={18} color='red' />
+                                </div>
+                            </Tooltip>
                         }
                     </div>
                     {/* QR code */}
                     <div className='ml-auto relative'>
                         {/* qr code */}
-                        <div className="relative group cursor-pointer" onClick={() => {
-                            setIsShareModalOpen(true)
-                            console.log('open')
-                        }}>
-                            <IconQrCode />
-                            <Tooltip text='View QR Code' dir='top' />
-                        </div>
+                        <Tooltip text='View QR Code' dir='top'>
+                            <div className="cursor-pointer" onClick={() => {
+                                setIsShareModalOpen(true)
+                            }}>
+                                <IconQrCode />
+                            </div>
+                        </Tooltip>
                     </div>
                 </div>
             </div>
