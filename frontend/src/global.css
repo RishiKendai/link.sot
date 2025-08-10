@@ -112,7 +112,7 @@ body {
 
 @layer {
   .btn {
-    @apply py-2 px-4 rounded-xl;
+    @apply py-2 px-4 rounded-md;
     color: var(--text-primary);
   }
 }
