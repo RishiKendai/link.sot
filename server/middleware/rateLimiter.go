@@ -86,15 +86,15 @@ func ExternalRateLimiter() gin.HandlerFunc {
 		uid := c.GetString("uid")
 
 		// Counter key per user per window
-		l, err := strconv.Atoi(env.GetEnvKey("RL__EXIT_LIMIT"))
+		l, err := strconv.Atoi(env.GetEnvKey("RL_EXT_LIMIT"))
 		if err != nil {
-			response.SendServerError(c, fmt.Errorf("invalid RL_LIMIT: %v", l))
+			response.SendServerError(c, fmt.Errorf("invalid RL_EXT_LIMIT: %v", l))
 			c.Abort()
 			return
 		}
 		w, err := strconv.Atoi(env.GetEnvKey("RL_EXT_WINDOW"))
 		if err != nil {
-			response.SendServerError(c, fmt.Errorf("invalid RL_LIMIT: %v", w))
+			response.SendServerError(c, fmt.Errorf("invalid RL_EXT_WINDOW: %v", w))
 			c.Abort()
 			return
 		}

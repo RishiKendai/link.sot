@@ -6,6 +6,7 @@ import (
 
 	apiV1 "github.com/RishiKendai/sot/api/v1"
 	routes "github.com/RishiKendai/sot/api/v1/routes"
+	externalV1 "github.com/RishiKendai/sot/external/v1"
 	"github.com/RishiKendai/sot/middleware"
 	"github.com/RishiKendai/sot/pkg/config/env"
 	mongodb "github.com/RishiKendai/sot/pkg/database/mongo"
@@ -30,7 +31,6 @@ func main() {
 	fmt.Println("Cron service started")
 
 	router := gin.Default()
-	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Use(middleware.CORSMiddleware())
 
 	// Load HTML templates for static pages
@@ -45,6 +45,11 @@ func main() {
 
 	// Register public short link routes (no prefix)
 	routes.RegisterPublicRoutes(router)
+
+	externalAPI := router.Group("/external/v1")
+	{
+		externalV1.RegisterRoutes(externalAPI)
+	}
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

@@ -4,14 +4,18 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/RishiKendai/sot/pkg/config/env"
 	"github.com/RishiKendai/sot/pkg/config/response"
+	mongodb "github.com/RishiKendai/sot/pkg/database/mongo"
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 	rdb "github.com/RishiKendai/sot/pkg/database/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -44,7 +48,7 @@ func GenerateJWT(uid, email, name string, tv int) (string, error) {
 		Name:         name,
 		TokenVersion: tv,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Second)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -136,6 +140,41 @@ func Authenticate() gin.HandlerFunc {
 		c.Set("name", name)
 		c.SetSameSite(http.SameSiteLaxMode)
 		c.SetCookie("token", token.Raw, 60*60*24, "/", "", false, true)
+		c.Next()
+	}
+}
+
+func ExternalAuthenticate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		type APIKeyProjection struct {
+			Uid string `bson:"uid"`
+		}
+
+		ah := c.GetHeader("Authorization")
+		if ah == "" || !strings.HasPrefix(ah, "Bearer ") {
+			c.AbortWithStatusJSON(401, gin.H{"error": "Missing or invalid API key"})
+			return
+		}
+
+		rkey := strings.TrimPrefix(ah, "Bearer ")
+
+		hrkey := HashAPIKey(rkey)
+
+		var result APIKeyProjection
+
+		opts := options.FindOne().SetProjection(bson.M{"uid": 1})
+		api_doc := mongodb.FindOne("api_keys", bson.M{"hash": hrkey}, opts)
+		if api_doc.Err() != nil {
+			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid API key"})
+			return
+		}
+		err := api_doc.Decode(&result)
+		if err != nil {
+			fmt.Println("Error decoding API key document:", err)
+			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid API key"})
+			return
+		}
+		c.Set("uid", result.Uid)
 		c.Next()
 	}
 }

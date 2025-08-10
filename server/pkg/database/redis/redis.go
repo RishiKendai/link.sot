@@ -1,7 +1,6 @@
 package rdb
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -12,7 +11,6 @@ func (r *redisService) SetExpiry(key string, t time.Duration) error {
 }
 
 func (r *redisService) Set(key string, value any, expiration *time.Duration) error {
-	fmt.Println("check>> ", value, expiration)
 	if expiration != nil {
 		return r.client.Set(r.ctx, key, value, *expiration).Err()
 	}

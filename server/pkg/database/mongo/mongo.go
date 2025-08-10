@@ -42,7 +42,7 @@ func Find(collection string, filter interface{}, option ...*options.FindOptions)
 }
 
 func FindOne(collection string, filter interface{}, options ...*options.FindOneOptions) *mongo.SingleResult {
-	collectionCtx := DB.Database("hyreV3").Collection(collection)
+	collectionCtx := DB.Database(Database).Collection(collection)
 	result := collectionCtx.FindOne(context.TODO(), filter, options...)
 	return result
 }
