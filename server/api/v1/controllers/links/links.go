@@ -263,6 +263,13 @@ func GetLinksHandler() gin.HandlerFunc {
 			}
 			links = append(links, link)
 		}
+
+		// Build full short link URLs efficiently in batch
+		if err := buildShortLinkURLsBatch(links); err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+
 		if err = sqlRows.Err(); err != nil {
 			response.SendServerError(c, err)
 			return
@@ -346,6 +353,13 @@ func SearchLinksHandler() gin.HandlerFunc {
 			}
 			links = append(links, link)
 		}
+
+		// Build full short link URLs efficiently in batch
+		if err := buildShortLinkURLsBatch(links); err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+
 		if err = sqlRows.Err(); err != nil {
 			response.SendServerError(c, err)
 			return
@@ -410,6 +424,13 @@ func GetLinkHandler() gin.HandlerFunc {
 		} else {
 			link.Tags = []string{}
 		}
+
+		// Build full short link URL
+		if err := buildShortLinkURLsBatch([]Link{link}); err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+
 		lJSON, err := json.Marshal(link)
 		duration := time.Minute * 5
 		rdb.RC.Set(k, lJSON, &duration)
@@ -672,6 +693,7 @@ func GetLinkAnalyticsHandler() gin.HandlerFunc {
 		var sc struct {
 			ShortLink           string
 			OriginalLink        string
+			UserUID             string
 			Deleted             bool
 			CreatedOn           time.Time
 			ExpiriesOn          time.Time
@@ -684,12 +706,12 @@ func GetLinkAnalyticsHandler() gin.HandlerFunc {
 			return
 		}
 		// Get short_link from links table and check if it is deleted
-		sqlRow, err := postgres.FindOne("SELECT short_link, original_link, expiry_date, password, deleted, created_at  FROM links WHERE uid = $1", shortLink)
+		sqlRow, err := postgres.FindOne("SELECT short_link, original_link, user_uid, expiry_date, password, deleted, created_at  FROM links WHERE uid = $1", shortLink)
 		if err != nil {
 			response.SendServerError(c, err)
 			return
 		}
-		err = sqlRow.Scan(&sc.ShortLink, &sc.OriginalLink, &sc.ExpiriesOn, &sc.Password, &sc.Deleted, &sc.CreatedOn)
+		err = sqlRow.Scan(&sc.ShortLink, &sc.OriginalLink, &sc.UserUID, &sc.ExpiriesOn, &sc.Password, &sc.Deleted, &sc.CreatedOn)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				response.SendNotFoundError(c, "Link not found")
@@ -703,7 +725,7 @@ func GetLinkAnalyticsHandler() gin.HandlerFunc {
 			return
 		}
 		// if not get analytics from analytics table
-		analytics := fetchLinkAnalytics(sc.ShortLink)
+		analytics := fetchLinkAnalytics(sc.ShortLink, sc.UserUID)
 		analytics.CreatedOn = sc.CreatedOn
 		analytics.OriginalURL = sc.OriginalLink
 		if sc.Password != nil {

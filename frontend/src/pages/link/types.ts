@@ -2,6 +2,7 @@ import type { GeoGraphicDataType } from '../analytics/types';
 
 export type LAnalyticType = {
     short_link: string;
+    full_short_link: string;
     original_link: string;
     total_clicks: number;
     qr_clicks: number;

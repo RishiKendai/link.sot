@@ -22,6 +22,7 @@ type Stats struct {
 	User_uid          string    `json:"user_uid"`
 	Original_url      string    `json:"original_url"`
 	Short_link        string    `json:"short_link"`
+	FullShortLink     string    `json:"full_short_link"` // Added field for complete short link URL
 	Is_custom_backoff bool      `json:"is_custom_backoff"`
 	Created_at        time.Time `json:"created_at"`
 	Expiry_date       time.Time `json:"expiry_date"`

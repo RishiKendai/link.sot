@@ -21,6 +21,7 @@ type Link struct {
 	Uid               string    `json:"uid"`
 	Original_url      string    `json:"original_url"`
 	Short_link        string    `json:"short_link"`
+	FullShortLink     string    `json:"full_short_link"`
 	Created_at        time.Time `json:"created_at"`
 	Expiry_date       time.Time `json:"expiry_date"`
 	Password          *string   `json:"password"`
@@ -49,6 +50,7 @@ type PaginatedLinksResponse struct {
 
 type LinkAnalytics struct {
 	ShortLink           string           `json:"short_link"`
+	FullShortLink       string           `json:"full_short_link"` // Added field for complete short link URL
 	OriginalURL         string           `json:"original_link"`
 	TotalClicks         int              `json:"total_clicks"`
 	UniqueVisitors      int              `json:"unique_visitors"`

@@ -1,20 +1,22 @@
 package analytics
 
 type TopPerformingLink struct {
-	ShortLink    string `json:"short_link"`
-	OriginalLink string `json:"original_link"`
-	TotalClicks  int64  `json:"total_clicks"`
-	QRClicks     int64  `json:"qr_clicks"`
-	DirectClicks int64  `json:"direct_clicks"`
+	ShortLink     string `json:"short_link"`
+	FullShortLink string `json:"full_short_link"` // Added field for complete short link URL
+	OriginalLink  string `json:"original_link"`
+	TotalClicks   int64  `json:"total_clicks"`
+	QRClicks      int64  `json:"qr_clicks"`
+	DirectClicks  int64  `json:"direct_clicks"`
 }
 
 type RecentActivity struct {
-	ShortLink    string `json:"short_link"`
-	OriginalLink string `json:"original_link"`
-	Location     string `json:"location"`     // City, Country
-	Device       string `json:"device"`       // Browser, Device type
-	ClickSource  string `json:"click_source"` // Direct Visit | QR Code | External Source
-	ClickTime    string `json:"click_time"`   // Timestamp of the click May 23, 2025 at 1:23 PM
+	ShortLink     string `json:"short_link"`
+	FullShortLink string `json:"full_short_link"` // Added field for complete short link URL
+	OriginalLink  string `json:"original_link"`
+	Location      string `json:"location"`     // City, Country
+	Device        string `json:"device"`       // Browser, Device type
+	ClickSource   string `json:"click_source"` // Direct Visit | QR Code | External Source
+	ClickTime     string `json:"click_time"`   // Timestamp of the click May 23, 2025 at 1:23 PM
 }
 
 type AnalyticsStats struct {

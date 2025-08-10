@@ -25,7 +25,6 @@ import Tooltip from '../../components/ui/Tooltip';
 import IconShieldOff from '../../components/ui/icons/IconShieldOff';
 
 
-const baseURL = import.meta.env.VITE_SOT_HOST
 
 const LinkAnalytics: React.FC = () => {
     const { id: uid } = useParams()
@@ -131,7 +130,7 @@ const LinkDetails: React.FC<{ link: LAnalyticType }> = ({ link }) => {
                             </Tooltip>
                     }
                     <span className='w-fit max-w-full truncate text-lg font-bold'>
-                        {baseURL}/{link.short_link}
+                        {link.full_short_link}
                     </span>
                 </div>
                 <StatsCard Icon={IconLink} title='Original URL' value={link.original_link} iconClass='gsbb' />

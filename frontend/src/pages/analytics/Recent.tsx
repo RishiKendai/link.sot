@@ -34,7 +34,7 @@ const Card: React.FC<{ data: RecentActivityType }> = ({ data }) => {
     <div className='overflow-hidden flex flex-col justify-between p-4 rounded-xl transition-transform duration-200 bg-white'>
       <span className='text-xs txt-2 mb-1'>{formatToHumanDate(data.click_time)}</span>
       <div className='w-full overflow-hidden mb-6'>
-        <h4 className='text-lg font-semibold truncate'>{data.short_link}</h4>
+        <h4 className='text-lg font-semibold truncate'>{data.full_short_link}</h4>
         <p className='text-xs txt-2 truncate'>{data.original_link}</p>
       </div>
       <div className='flex items-center flex-wrap gap-4 bg-[var(--ice-silver)] p-2 rounded-md'>

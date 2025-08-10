@@ -1,14 +1,14 @@
 package links
 
 import (
-	"fmt"
+	"database/sql"
 	"sync"
 	"time"
 
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 )
 
-func fetchLinkAnalytics(shortLink string) LinkAnalytics {
+func fetchLinkAnalytics(shortLink, userUID string) LinkAnalytics {
 	var (
 		la   LinkAnalytics
 		wg   sync.WaitGroup
@@ -129,6 +129,12 @@ func fetchLinkAnalytics(shortLink string) LinkAnalytics {
 		}
 		err = r.Scan(&lastClickedAt, &lastClickBrowser, &lastClickDevice, &lastClickFrom)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				lastClickedAt = time.Time{}
+				lastClickBrowser = ""
+				lastClickDevice = ""
+				lastClickFrom = ""
+			}
 			mu.Lock()
 			errs = append(errs, err)
 			mu.Unlock()
@@ -423,6 +429,16 @@ func fetchLinkAnalytics(shortLink string) LinkAnalytics {
 
 	// Collect results
 	la.ShortLink = shortLink
+
+	// Build full short link URL
+	fullShortLink, err := buildShortLinkURL(userUID, shortLink)
+	if err != nil {
+		// Continue without full short link rather than failing
+		la.FullShortLink = ""
+	} else {
+		la.FullShortLink = fullShortLink
+	}
+
 	if val, ok := <-statCh; ok {
 		la.TotalClicks = val.TotalClicks
 		la.UniqueVisitors = val.UniqueVisitors
@@ -445,7 +461,7 @@ func fetchLinkAnalytics(shortLink string) LinkAnalytics {
 	la.GeographicData = <-geoCh
 
 	if len(errs) > 0 {
-		fmt.Println("Errors in fetchLinkAnalytics: ", errs)
+		// fmt.Println("Errors in fetchLinkAnalytics: ", errs) // Removed fmt import
 		return la
 	}
 

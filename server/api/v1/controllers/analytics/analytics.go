@@ -1,7 +1,9 @@
 package analytics
 
 import (
+	"database/sql"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -9,6 +11,37 @@ import (
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 	"github.com/gin-gonic/gin"
 )
+
+// buildShortLinkURL builds the complete short link URL based on user's subdomain settings
+func buildShortLinkURL(userUID, shortLink string) (string, error) {
+	// Check if user has subdomain enabled
+	var useSubdomain bool
+	var subdomain sql.NullString
+
+	query := "SELECT use_subdomain, subdomain FROM users WHERE uid = $1"
+	row, err := postgres.FindOne(query, userUID)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch user subdomain settings: %w", err)
+	}
+
+	err = row.Scan(&useSubdomain, &subdomain)
+	if err != nil {
+		return "", fmt.Errorf("failed to scan user subdomain settings: %w", err)
+	}
+
+	// Get SOT domain from environment
+	sotDomain := os.Getenv("SOT_DOMAIN")
+	if sotDomain == "" {
+		panic("SOT_DOMAIN is not set")
+	}
+
+	// Build URL based on subdomain settings
+	if useSubdomain && subdomain.Valid && subdomain.String != "" {
+		return fmt.Sprintf("%s.%s/%s", subdomain.String, sotDomain, shortLink), nil
+	} else {
+		return fmt.Sprintf("%s/%s", sotDomain, shortLink), nil
+	}
+}
 
 // GetAnalyticsHandler returns comprehensive analytics data
 func GetAnalyticsHandler() gin.HandlerFunc {
@@ -120,6 +153,26 @@ func getAnalyticsSummary(userUID, startDate, endDate string) (*AnalyticsSummary,
 func getLinkAnalytics(shortLink string) (map[string]interface{}, error) {
 	analytics := make(map[string]interface{})
 
+	// Get link details to build full_short_link
+	linkRow, err := postgres.FindOne("SELECT user_uid, short_link FROM links WHERE short_link = $1", shortLink)
+	if err != nil {
+		return nil, err
+	}
+
+	var userUID, linkShortLink string
+	if err := linkRow.Scan(&userUID, &linkShortLink); err != nil {
+		return nil, err
+	}
+
+	// Build full short link URL
+	fullShortLink, err := buildShortLinkURL(userUID, linkShortLink)
+	if err != nil {
+		// Continue without full short link rather than failing
+		analytics["full_short_link"] = ""
+	} else {
+		analytics["full_short_link"] = fullShortLink
+	}
+
 	// Get total clicks for this link
 	totalClicks, err := postgres.CountDocuments("SELECT COUNT(*) FROM analytics WHERE short_link = $1", shortLink)
 	if err != nil {
@@ -157,7 +210,7 @@ func getLinkAnalytics(shortLink string) (map[string]interface{}, error) {
 		for osRows.Next() {
 			var os string
 			var count int64
-			if err := osRows.Scan(&os, &count); err == nil {
+			if err := browserRows.Scan(&os, &count); err == nil {
 				osStats[os] = count
 			}
 		}

@@ -41,6 +41,7 @@ type Stats = {
   created_at: Date;
   deleted: boolean;
   original_url: string;
+  full_short_link: string;
   password: string;
   scan_link: boolean;
   short_link: string;

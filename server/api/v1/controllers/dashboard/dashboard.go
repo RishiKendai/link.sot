@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -11,6 +12,37 @@ import (
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 	"github.com/gin-gonic/gin"
 )
+
+// buildShortLinkURL builds the complete short link URL based on user's subdomain settings
+func buildShortLinkURL(userUID, shortLink string) (string, error) {
+	// Check if user has subdomain enabled
+	var useSubdomain bool
+	var subdomain sql.NullString
+
+	query := "SELECT use_subdomain, subdomain FROM users WHERE uid = $1"
+	row, err := postgres.FindOne(query, userUID)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch user subdomain settings: %w", err)
+	}
+
+	err = row.Scan(&useSubdomain, &subdomain)
+	if err != nil {
+		return "", fmt.Errorf("failed to scan user subdomain settings: %w", err)
+	}
+
+	// Get SOT domain from environment
+	sotDomain := os.Getenv("SOT_DOMAIN")
+	if sotDomain == "" {
+		panic("SOT_DOMAIN is not set")
+	}
+
+	// Build URL based on subdomain settings
+	if useSubdomain && subdomain.Valid && subdomain.String != "" {
+		return fmt.Sprintf("%s.%s/%s", subdomain.String, sotDomain, shortLink), nil
+	} else {
+		return fmt.Sprintf("%s/%s", sotDomain, shortLink), nil
+	}
+}
 
 func Dashboard() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -122,6 +154,7 @@ func fetchDashboardData(uid string) DashboardStruct {
 			Uid:               "",
 			Original_url:      "",
 			Short_link:        "",
+			FullShortLink:     "", // Will be populated below
 			Is_custom_backoff: false,
 			Created_at:        time.Time{},
 			Expiry_date:       time.Time{},
@@ -174,6 +207,18 @@ func fetchDashboardData(uid string) DashboardStruct {
 		} else {
 			stats.Tags = []string{}
 		}
+
+		// Build full short link URL
+		if stats.Short_link != "" {
+			fullShortLink, err := buildShortLinkURL(stats.User_uid, stats.Short_link)
+			if err != nil {
+				fmt.Printf("Error building short link URL: %v\n", err)
+				// Continue without full short link rather than failing
+			} else {
+				stats.FullShortLink = fullShortLink
+			}
+		}
+
 		recentLinkStatsCh <- stats
 	}()
 

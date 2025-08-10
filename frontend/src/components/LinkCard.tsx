@@ -20,6 +20,7 @@ type LinkType = {
     uid: string;
     original_url: string;
     short_link: string;
+    full_short_link: string;
     tags: string[];
     created_at: Date;
     expiry_date: Date;
@@ -36,7 +37,6 @@ type LinkProps = {
 }
 
 
-const baseURL = import.meta.env.VITE_SOT_HOST
 
 const LinkCard: React.FC<LinkProps> = ({ link, setLinkId }) => {
     const { hide = [] } = link
@@ -58,7 +58,7 @@ const LinkCard: React.FC<LinkProps> = ({ link, setLinkId }) => {
                     <div className="flex flex-1 flex-col px-4 min-w-0">
                         <div className="flex flex-col mb-8">
                             <p className="w-fit text-gray-400 text-sm font-medium mb-1">{formatToHumanDate(link.created_at.toString())}</p>
-                            <p className="w-fit max-w-full text-[var(--text-primary)] text-lg font-bold truncate">{baseURL}/{link.short_link}</p>
+                            <p className="w-fit max-w-full text-[var(--text-primary)] text-lg font-bold truncate">{link.full_short_link}</p>
                             <a href={link.original_url} target="_blank" rel="noopener noreferrer" className="w-fit text-sm max-w-full truncate text-blue-500 hover:underline hover:text-blue-600 underline-offset-3">{link.original_url}</a>
                         </div>
 
@@ -125,7 +125,7 @@ const LinkCard: React.FC<LinkProps> = ({ link, setLinkId }) => {
                                 <div
                                     className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 border border-gray-200'
                                     onClick={() => {
-                                        navigator.clipboard.writeText(baseURL + '/' + link.short_link)
+                                        navigator.clipboard.writeText(link.full_short_link)
                                         setCopiedLinkId(link.uid)
                                         setTimeout(() => {
                                             setCopiedLinkId(null)
@@ -151,7 +151,7 @@ const LinkCard: React.FC<LinkProps> = ({ link, setLinkId }) => {
                         {/* Delete */}
                         {hide && !hide.includes('delete') && setLinkId &&
                             <Tooltip text='Delete' dir='bottom'>
-                                <div onClick={() => setLinkId(link.uid)} className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-red-100 border border-red-200'>
+                                <div onClick={() => setLinkId(link.full_short_link)} className='flex cursor-pointer items-center justify-center w-8 h-8 rounded-md hover:bg-red-100 border border-red-200'>
                                     <IconDelete size={18} color='red' />
                                 </div>
                             </Tooltip>
@@ -170,7 +170,7 @@ const LinkCard: React.FC<LinkProps> = ({ link, setLinkId }) => {
                     </div>
                 </div>
             </div>
-            {isShareModalOpen && <ModalShare url={link.short_link} handleModalState={setIsShareModalOpen} />}
+            {isShareModalOpen && <ModalShare url={link.full_short_link} handleModalState={setIsShareModalOpen} />}
         </>
     )
 }

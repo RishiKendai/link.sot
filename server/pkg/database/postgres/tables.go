@@ -9,6 +9,9 @@ func createUser() error {
 			name VARCHAR(255) NOT NULL,
 			email VARCHAR(255) NOT NULL UNIQUE,
 			password VARCHAR(255) NOT NULL,
+			subdomain VARCHAR(255) DEFAULT NULL,
+			use_subdomain BOOLEAN DEFAULT FALSE,
+			token_version INTEGER DEFAULT 1,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		);`
 

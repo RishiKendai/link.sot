@@ -11,8 +11,6 @@ type ModalProps = {
     handleModalState: (state: boolean) => void
 }
 
-const baseURL = import.meta.env.VITE_SOT_HOST
-
 const ModalShare: React.FC<ModalProps> = ({ url, handleModalState }) => {
     const [isLinkCopied, setIsLinkCopied] = useState(false)
     useEffect(() => {
@@ -66,9 +64,9 @@ const ModalShare: React.FC<ModalProps> = ({ url, handleModalState }) => {
                     </span>
                 </div>
                 <div className='bg-gray-100 min-w-0 flex items-center overflow-hidden p-2 px-4 rounded-lg mb-6'>
-                    <span className='text-sm text-nowrap truncate w-fit max-w-full'>{baseURL}/{url}</span>
+                    <span className='text-sm text-nowrap truncate w-fit max-w-full'>{url}</span>
                     <span className='ml-2 cursor-pointer  p-2' onClick={() => {
-                        navigator.clipboard.writeText(baseURL + '/' + url)
+                        navigator.clipboard.writeText(url)
                         setIsLinkCopied(true)
                         setTimeout(() => {
                             setIsLinkCopied(false)
@@ -82,12 +80,12 @@ const ModalShare: React.FC<ModalProps> = ({ url, handleModalState }) => {
                     </span>
                 </div>
                 <QRCodeGenerator
-                    url={`${baseURL}/${url}?r=qr`}
+                    url={`${url}?r=qr`}
                     size={78}
                     className="mb-6"
                 />
                 <QRCodeGenerator
-                    url={`${baseURL}/${url}?r=qr`}
+                    url={`${url}?r=qr`}
                     size={2000}
                     id='QRCode'
                     className="mb-6 hidden"

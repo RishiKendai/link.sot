@@ -1,11 +1,104 @@
 package analytics
 
 import (
+	"database/sql"
+	"fmt"
+	"os"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 )
+
+// UserSubdomainSettings represents user subdomain configuration
+type UserSubdomainSettings struct {
+	UID          string
+	UseSubdomain bool
+	Subdomain    sql.NullString
+}
+
+// batchFetchUserSubdomainSettings fetches subdomain settings for multiple users in a single query
+func batchFetchUserSubdomainSettings(userUIDs []string) (map[string]UserSubdomainSettings, error) {
+	if len(userUIDs) == 0 {
+		return make(map[string]UserSubdomainSettings), nil
+	}
+
+	// Create placeholders for the IN clause
+	placeholders := make([]string, len(userUIDs))
+	args := make([]interface{}, len(userUIDs))
+	for i, uid := range userUIDs {
+		placeholders[i] = fmt.Sprintf("$%d", i+1)
+		args[i] = uid
+	}
+
+	query := fmt.Sprintf("SELECT uid, use_subdomain, subdomain FROM users WHERE uid IN (%s)", strings.Join(placeholders, ","))
+
+	rows, err := postgres.FindMany(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch user subdomain settings: %w", err)
+	}
+	defer rows.Close()
+
+	settings := make(map[string]UserSubdomainSettings)
+	for rows.Next() {
+		var setting UserSubdomainSettings
+		err := rows.Scan(&setting.UID, &setting.UseSubdomain, &setting.Subdomain)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan user subdomain settings: %w", err)
+		}
+		settings[setting.UID] = setting
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over user subdomain settings: %w", err)
+	}
+
+	return settings, nil
+}
+
+// buildShortLinkURLsBatchForAnalytics builds complete short link URLs for analytics data efficiently
+func buildShortLinkURLsBatchForAnalytics(topLinks []TopPerformingLink, recentActivities []RecentActivity, userUID string) error {
+	// Get SOT domain from environment
+	sotDomain := os.Getenv("SOT_DOMAIN")
+	if sotDomain == "" {
+		panic("SOT_DOMAIN is not set")
+	}
+
+	// Fetch user subdomain settings
+	userSettings, err := batchFetchUserSubdomainSettings([]string{userUID})
+	if err != nil {
+		return err
+	}
+
+	settings, exists := userSettings[userUID]
+	if !exists {
+		// Fallback to default format if user not found
+		settings = UserSubdomainSettings{UseSubdomain: false}
+	}
+
+	// Build URLs for top performing links
+	for i := range topLinks {
+		link := &topLinks[i]
+		if settings.UseSubdomain && settings.Subdomain.Valid && settings.Subdomain.String != "" {
+			link.FullShortLink = fmt.Sprintf("%s.%s/%s", settings.Subdomain.String, sotDomain, link.ShortLink)
+		} else {
+			link.FullShortLink = fmt.Sprintf("%s/%s", sotDomain, link.ShortLink)
+		}
+	}
+
+	// Build URLs for recent activities
+	for i := range recentActivities {
+		activity := &recentActivities[i]
+		if settings.UseSubdomain && settings.Subdomain.Valid && settings.Subdomain.String != "" {
+			activity.FullShortLink = fmt.Sprintf("%s.%s/%s", settings.Subdomain.String, sotDomain, activity.ShortLink)
+		} else {
+			activity.FullShortLink = fmt.Sprintf("%s/%s", sotDomain, activity.ShortLink)
+		}
+	}
+
+	return nil
+}
 
 func fetchTopPerformingLinks(wg *sync.WaitGroup, ch chan<- []TopPerformingLink, mu *sync.Mutex, errs *[]error, userUID string, startDate, endDate string) {
 	defer wg.Done()
@@ -44,6 +137,14 @@ func fetchTopPerformingLinks(wg *sync.WaitGroup, ch chan<- []TopPerformingLink, 
 			continue
 		}
 		topLinks = append(topLinks, topLink)
+	}
+
+	// Build full short link URLs efficiently in batch
+	if err := buildShortLinkURLsBatchForAnalytics(topLinks, []RecentActivity{}, userUID); err != nil {
+		mu.Lock()
+		*errs = append(*errs, err)
+		mu.Unlock()
+		return
 	}
 
 	ch <- topLinks
@@ -95,8 +196,15 @@ func fetchRecentActivity(wg *sync.WaitGroup, ch chan<- []RecentActivity, mu *syn
 		recentActivities = append(recentActivities, recent)
 	}
 
-	ch <- recentActivities
+	// Build full short link URLs efficiently in batch
+	if err := buildShortLinkURLsBatchForAnalytics([]TopPerformingLink{}, recentActivities, userUID); err != nil {
+		mu.Lock()
+		*errs = append(*errs, err)
+		mu.Unlock()
+		return
+	}
 
+	ch <- recentActivities
 }
 
 func fetchAnalyticsStats(wg *sync.WaitGroup, ch chan<- AnalyticsStats, mu *sync.Mutex, errs *[]error, userUID, startDate, endDate string) {

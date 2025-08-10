@@ -1,5 +1,6 @@
 export type TopPerformingLinkType = {
     short_link: string;
+    full_short_link: string;
     original_link: string;
     total_clicks: number;
     qr_clicks: number;
@@ -8,6 +9,7 @@ export type TopPerformingLinkType = {
 
 export type RecentActivityType = {
     short_link: string;
+    full_short_link: string;
     original_link: string;
     location: string;
     device: string;

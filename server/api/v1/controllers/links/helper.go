@@ -249,3 +249,129 @@ func getClientIP(c *gin.Context) string {
 	}
 	return c.ClientIP()
 }
+
+// buildShortLinkURL builds the complete short link URL based on user's subdomain settings
+func buildShortLinkURL(userUID, shortLink string) (string, error) {
+	// Check if user has subdomain enabled
+	var useSubdomain bool
+	var subdomain sql.NullString
+
+	query := "SELECT use_subdomain, subdomain FROM users WHERE uid = $1"
+	row, err := postgres.FindOne(query, userUID)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch user subdomain settings: %w", err)
+	}
+
+	err = row.Scan(&useSubdomain, &subdomain)
+	if err != nil {
+		return "", fmt.Errorf("failed to scan user subdomain settings: %w", err)
+	}
+
+	// Get SOT domain from environment
+	sotDomain := os.Getenv("SOT_DOMAIN")
+	if sotDomain == "" {
+		panic("SOT_DOMAIN is not set")
+	}
+
+	// Build URL based on subdomain settings
+	if useSubdomain && subdomain.Valid && subdomain.String != "" {
+		return fmt.Sprintf("%s.%s/%s", subdomain.String, sotDomain, shortLink), nil
+	} else {
+		return fmt.Sprintf("%s/%s", sotDomain, shortLink), nil
+	}
+}
+
+// UserSubdomainSettings represents user subdomain configuration
+type UserSubdomainSettings struct {
+	UID          string
+	UseSubdomain bool
+	Subdomain    sql.NullString
+}
+
+// batchFetchUserSubdomainSettings fetches subdomain settings for multiple users in a single query
+func batchFetchUserSubdomainSettings(userUIDs []string) (map[string]UserSubdomainSettings, error) {
+	if len(userUIDs) == 0 {
+		return make(map[string]UserSubdomainSettings), nil
+	}
+
+	// Create placeholders for the IN clause
+	placeholders := make([]string, len(userUIDs))
+	args := make([]interface{}, len(userUIDs))
+	for i, uid := range userUIDs {
+		placeholders[i] = fmt.Sprintf("$%d", i+1)
+		args[i] = uid
+	}
+
+	query := fmt.Sprintf("SELECT uid, use_subdomain, subdomain FROM users WHERE uid IN (%s)", strings.Join(placeholders, ","))
+
+	rows, err := postgres.FindMany(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch user subdomain settings: %w", err)
+	}
+	defer rows.Close()
+
+	settings := make(map[string]UserSubdomainSettings)
+	for rows.Next() {
+		var setting UserSubdomainSettings
+		err := rows.Scan(&setting.UID, &setting.UseSubdomain, &setting.Subdomain)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan user subdomain settings: %w", err)
+		}
+		settings[setting.UID] = setting
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over user subdomain settings: %w", err)
+	}
+
+	return settings, nil
+}
+
+// buildShortLinkURLsBatch builds complete short link URLs for multiple links efficiently
+func buildShortLinkURLsBatch(links []Link) error {
+	if len(links) == 0 {
+		return nil
+	}
+
+	// Collect unique user UIDs
+	userUIDs := make([]string, 0, len(links))
+	userUIDMap := make(map[string]bool)
+	for _, link := range links {
+		if !userUIDMap[link.User_uid] {
+			userUIDs = append(userUIDs, link.User_uid)
+			userUIDMap[link.User_uid] = true
+		}
+	}
+
+	// Fetch all user subdomain settings in one query
+	userSettings, err := batchFetchUserSubdomainSettings(userUIDs)
+	if err != nil {
+		return err
+	}
+
+	// Get SOT domain from environment
+	sotDomain := os.Getenv("SOT_DOMAIN")
+	if sotDomain == "" {
+		panic("SOT_DOMAIN is not set")
+	}
+
+	// Build URLs for all links
+	for i := range links {
+		link := &links[i]
+		settings, exists := userSettings[link.User_uid]
+		if !exists {
+			// Fallback to default format if user not found
+			link.FullShortLink = fmt.Sprintf("%s/%s", sotDomain, link.Short_link)
+			continue
+		}
+
+		// Build full short link URL
+		if settings.UseSubdomain && settings.Subdomain.Valid && settings.Subdomain.String != "" {
+			link.FullShortLink = fmt.Sprintf("%s.%s/%s", settings.Subdomain.String, sotDomain, link.Short_link)
+		} else {
+			link.FullShortLink = fmt.Sprintf("%s/%s", sotDomain, link.Short_link)
+		}
+	}
+
+	return nil
+}

@@ -8,8 +8,6 @@ type PerformanceChartProps = {
     data: TopPerformingLinkType[]
 }
 
-const BASE_URL = import.meta.env.VITE_SOT_HOST
-
 const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
     return (
         <div className='border-silver rounded-2xl py-6 bg-[var(--bg-secondary)]'>
@@ -41,7 +39,7 @@ const Card: React.FC<{ data: TopPerformingLinkType, index: number }> = ({ data, 
             )}
         >
             <div className='w-full overflow-hidden'>
-                <h4 className='text-lg font-semibold truncate'>{BASE_URL}/{data.short_link}</h4>
+                <h4 className='text-lg font-semibold truncate'>{data.full_short_link}</h4>
                 <p className='text-xs txt-2 truncate'>{data.original_link}</p>
             </div>
             <div className="my-4 border-t border-t-[var(--clr-border)] w-full h-[1px]"></div>

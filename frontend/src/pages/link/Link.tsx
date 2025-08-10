@@ -24,6 +24,7 @@ type Link = {
     uid: string;
     original_url: string;
     short_link: string;
+    full_short_link: string;
     tags: string[];
     created_at: Date;
     expiry_date: Date;
@@ -32,8 +33,6 @@ type Link = {
     is_custom_backoff: boolean;
     updated_at: Date;
 }
-
-const baseURL = import.meta.env.VITE_SOT_HOST
 
 const Link: React.FC = () => {
     const queryClient = useQueryClient()
@@ -264,7 +263,7 @@ const Link: React.FC = () => {
             <Modal isOpen={linkId !== ''} onClose={() => setLinkId('')}>
                 <form onSubmit={deleteLinkHandler}>
                     <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
-                    <p className="text-gray-600 mb-4">Are you sure you want to delete <span className='font-semibold text-red-800'>{`${baseURL}/${linkId}`}</span>?</p>
+                    <p className="text-gray-600 mb-4">Are you sure you want to delete <span className='font-semibold text-red-800'>{`${linkId}`}</span>?</p>
                     <div className="flex justify-end">
                         <Button
                             variant='tertiary'

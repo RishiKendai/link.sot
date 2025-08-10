@@ -76,7 +76,7 @@ func GetLinksHandler() gin.HandlerFunc {
 
 		go func() {
 			defer wg.Done()
-			query := `SELECT uid, original_link, short_link, is_custom_backoff, created_at, expiry_date,
+			query := `SELECT uid, user_uid, original_link, short_link, is_custom_backoff, created_at, expiry_date,
 				password, scan_link, is_flagged, updated_at, tags
 				FROM links 
 				WHERE user_uid = $1 AND deleted = false 
@@ -94,7 +94,7 @@ func GetLinksHandler() gin.HandlerFunc {
 				var link Link
 				var tagsJSON []byte
 				if err := rows.Scan(
-					&link.Uid, &link.Original_url, &link.Short_link,
+					&link.Uid, &link.User_uid, &link.Original_url, &link.Short_link,
 					&link.Is_custom_backoff, &link.Created_at, &link.Expiry_date,
 					&link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at,
 					&tagsJSON,
@@ -116,9 +116,27 @@ func GetLinksHandler() gin.HandlerFunc {
 
 				links = append(links, link)
 			}
-			if err := rows.Err(); err != nil {
+
+			// Build full short link URLs efficiently in batch
+			if err := buildShortLinkURLsBatch(links); err != nil {
 				errs <- err
+				return
 			}
+
+			// Send the response
+			response := map[string]interface{}{
+				"links": links,
+				"pagination": gin.H{
+					"total":        total,
+					"count":        len(links),
+					"per_page":     pageSize,
+					"current_page": page,
+					"total_pages":  int(math.Ceil(float64(total) / float64(pageSize))),
+					"has_next":     page < int(math.Ceil(float64(total)/float64(pageSize))),
+					"has_prev":     page > 1,
+				},
+			}
+			c.JSON(http.StatusOK, response)
 		}()
 
 		wg.Wait()
@@ -128,24 +146,6 @@ func GetLinksHandler() gin.HandlerFunc {
 			response.SendServerError(c, err)
 			return
 		}
-
-		// Prepare pagination response
-		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-		hasNext := page < totalPages
-		hasPrev := page > 1
-
-		response.SendJSON(c, gin.H{
-			"links": links,
-			"pagination": gin.H{
-				"total":        total,
-				"count":        len(links),
-				"per_page":     pageSize,
-				"current_page": page,
-				"total_pages":  totalPages,
-				"has_next":     hasNext,
-				"has_prev":     hasPrev,
-			},
-		})
 	}
 }
 
