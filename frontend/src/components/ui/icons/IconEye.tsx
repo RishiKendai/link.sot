@@ -4,7 +4,6 @@ import { IconBase, type IconBaseProps } from './IconBase';
 
 
 const IconEye: React.FC<IconBaseProps> = (props) => {
-    console.log('eye ', props)
     return (
         <IconBase {...props}>
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />

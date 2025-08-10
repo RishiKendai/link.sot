@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 const responseData = await res.json();
                 if (res.ok) {
                     const { data } = responseData;
-                    console.log('authenticated', data);
                     setAuthenticated(true);
                     setUser({ name: data.name, email: data.email });
                     if (window.location.pathname === '/') {
@@ -54,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setUser(null);
                 }
             } catch (error) {
-                console.log('error', error);
+                console.error('error', error);
                 setAuthenticated(false);
                 setUser(null);
             } finally {

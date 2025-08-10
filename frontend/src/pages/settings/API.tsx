@@ -28,7 +28,6 @@ const API: React.FC = () => {
       return
     }
     setFormError({})
-    console.log('createAPIKey', apiCreation)
     createAPIKeyMutation({
       path: '/settings/api', // update this path to your actual API endpoint
       method: 'POST',
@@ -38,7 +37,6 @@ const API: React.FC = () => {
         if (data.status === 'success' && data.data) {
 
           setAPICreation({ label: '' })
-          console.log('data success :::: ', data)
           setNewAPIKey(data.data.api_key)
           setShowSuccessModal(true)
         } else if (data.status === 'error') {
@@ -47,7 +45,7 @@ const API: React.FC = () => {
         }
       },
       onError: (err: unknown) => {
-        console.log('err :::: ', err)
+        console.error('err :::: ', err)
         toast.error('Failed to create API Key')
       }
     })

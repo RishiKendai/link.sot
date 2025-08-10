@@ -107,8 +107,6 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ weeklyStats, dailyStats, mont
   };
 
   const tabs: ('daily' | 'weekly' | 'monthly')[] = ['daily', 'weekly', 'monthly'];
-  console.log('chart data', chartData)
-  console.log('chart options', options)
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 w-full">
       <div className="flex flex-wrap gap-4 items-center justify-between mb-6">

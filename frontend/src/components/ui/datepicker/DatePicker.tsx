@@ -40,7 +40,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({ showCalendar, setShowCal
     // Function to update the expiry date with unified date:time
     const updateExpiryDate = (date: Date, timeString: string) => {
         const combinedDate = combineDateAndTime(date, timeString);
-        console.log('combinedDate', combinedDate, selectedTime)
         setExpiryDate(combinedDate);
     };
 

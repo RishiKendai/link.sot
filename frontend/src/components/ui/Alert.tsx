@@ -26,8 +26,6 @@ const cls = {
 }
 
 const Alert: React.FC<AlertProps> = ({ type, message, className }) => {
-    console.count('type')
-    console.log("Alert-----------------------")
     return (
         <div className={`${cls[type]} ${className} flex items-start space-x-2 text-sm font-medium px-4 py-2 rounded-lg`} role="alert">
             <span>{icon[type]}</span>

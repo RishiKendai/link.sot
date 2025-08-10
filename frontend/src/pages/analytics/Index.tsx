@@ -36,8 +36,6 @@ const Analytics: React.FC = () => {
 
     useEffect(() => {
         if (data?.status === 'success' && data.data) {
-            console.log('data found', data.data);
-console.log('daily weekly monthly', data.data.analytics_stats.daily_stats, data.data.analytics_stats.weekly_stats, data.data.analytics_stats.monthly_stats);
             setAnalytics(data.data);
         }
     }, [data])
@@ -96,7 +94,7 @@ console.log('daily weekly monthly', data.data.analytics_stats.daily_stats, data.
             </div>
             <div className="analytics-layout mb-8">
                 <ChartLayout label='Browser Chart' children={<BrowserChart browserStats={analytics.analytics_stats.browser_stats} />} />
-                <ChartLayout  label='Country Click HeatMap' children={<WorldMapChart geographicData={analytics.analytics_stats.geographic_data} />} />
+                <ChartLayout label='Country Click HeatMap' children={<WorldMapChart geographicData={analytics.analytics_stats.geographic_data} />} />
             </div>
         </div>
     );

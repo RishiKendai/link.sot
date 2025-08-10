@@ -131,7 +131,7 @@ const Link: React.FC = () => {
                 }
             },
             onError: (err: unknown) => {
-                console.log('err :::: ', err)
+                console.error('err :::: ', err)
                 setLinkId('')
                 toast.error('Failed to delete link')
             }

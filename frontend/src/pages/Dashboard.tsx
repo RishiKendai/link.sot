@@ -68,11 +68,8 @@ const Dashboard: React.FC = () => {
     key: ['dashboard']
   })
 
-  console.log('get ', data)
-
   useEffect(() => {
     if (data?.status === 'success' && data.data) {
-      console.log('data ', data.data.stats)
       data.data.stats.hide = ['edit', 'delete']
       setDState(data.data)
     }

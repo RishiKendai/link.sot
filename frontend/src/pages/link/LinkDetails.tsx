@@ -37,9 +37,7 @@ const LinkDetails: React.FC = () => {
     })
 
     useEffect(() => {
-        console.log('data', data)
         if (data?.status === 'success' && data.data) {
-            console.log('data', data.data)
             data.data.hide = ['edit', 'delete']
             setLink(data.data)
         }

@@ -45,7 +45,6 @@ export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutation
             // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const url = `${BASE_URL}/proxy${path}`;
             // const url = `${BASE_URL}${path}`;
-            console.log('url ', url)
             try {
                 const response = await fetch(url, {
                     method,
@@ -86,7 +85,6 @@ export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutation
                         }
                     }
                 }
-                console.log('in ', json)
                 return json as ResponseProps<TResponse>
             } catch (err: unknown) {
                 const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';

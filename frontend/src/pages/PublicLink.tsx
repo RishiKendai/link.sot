@@ -22,10 +22,9 @@ const PublicLink: React.FC = () => {
     const checkLinkStatus = async () => {
         try {
             const API_BASE = import.meta.env.VITE_API_BASE_URL;
-            console.log(`check:: ${API_BASE}/api/v1/r/${short}`)
             window.location.href = `${API_BASE}/api/v1/r/${short}`;
         } catch (err) {
-            console.error('this ', err);
+            console.error('error:: ', err);
             setError('Something went wrong. Please try again.');
         }
     };

@@ -54,7 +54,6 @@ const ChipInput: React.FC<ChipInputProps> = ({
 
     // Only update chips from initialValues on the very first render
     useEffect(() => {
-        console.log('initialValues', initialValues)
         // if (!hasInitialized) {
         const chipsList = initialValues.map(v => v.trim()).filter(Boolean);
         setChips(chipsList);
@@ -79,7 +78,6 @@ const ChipInput: React.FC<ChipInputProps> = ({
     // }, [chips, onValuesChange, isInitialized]);
 
     const addChip = (value: string) => {
-        console.log('addChip', value)
         const trimmed = value.trim();
         if (!trimmed || chips.includes(trimmed)) return;
         if (maxChips && chips.length >= maxChips) return;

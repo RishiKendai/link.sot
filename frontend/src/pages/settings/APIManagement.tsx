@@ -26,7 +26,6 @@ const APIManagement: React.FC = () => {
 
     useEffect(() => {
         if (data?.status === 'success' && data.data) {
-            console.log('data, ', data.data.api_keys)
             setApiKeys(data.data.api_keys)
         }
     }, [data])
@@ -54,7 +53,7 @@ const APIManagement: React.FC = () => {
                 }
             },
             onError: (err: unknown) => {
-                console.log('err :::: ', err)
+                console.error('err :::: ', err)
                 toast.error('Failed to delete API Key')
                 setKeyToDelete('')
             }

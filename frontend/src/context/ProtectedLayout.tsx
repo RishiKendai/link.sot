@@ -3,7 +3,6 @@ import { useAuth } from './UseAuth';
 
 const ProtectedLayout = () => {
     const { isAuthenticated, isLoading } = useAuth();
-    console.log('isAuthenticated ', isAuthenticated)
     if (!isAuthenticated && !isLoading) {
         return <Navigate to="/" replace />;
     }

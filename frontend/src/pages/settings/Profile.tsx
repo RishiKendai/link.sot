@@ -81,11 +81,11 @@ const Profile: React.FC = () => {
                     })
                 } else if (data.status === 'error') {
                     toast.error("Failed to update profile")
-                    console.error('Failed to udpate profile:: ', data.error)
+                    console.error('Failed to update profile:: ', data.error)
                 }
             },
             onError: (err: unknown) => {
-                console.log('err :::: ', err)
+                console.error('err :::: ', err)
                 toast.error('Failed to update profile')
             }
         })

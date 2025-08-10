@@ -124,16 +124,13 @@ const Sidebar: React.FC = () => {
 
   // Mouse event handlers for logo hover
   const handleLogoMouseEnter = () => {
-    console.log('enter ', isSidebarExpanded, isMobileScreen)
     if (!isSidebarExpanded && !isMobileScreen && logoRef.current && toggleButtonRef.current) {
-      console.log('enter ', logoRef.current, toggleButtonRef.current)
       logoRef.current.style.display = 'none';
       toggleButtonRef.current.style.display = 'flex';
     }
   };
 
   const handleLogoMouseLeave = () => {
-    console.log('leave ', isSidebarExpanded, isMobileScreen)
     if (!isSidebarExpanded && !isMobileScreen && logoRef.current && toggleButtonRef.current) {
       logoRef.current.style.display = 'flex';
       toggleButtonRef.current.style.display = 'none';
@@ -142,7 +139,6 @@ const Sidebar: React.FC = () => {
 
   // Toggle function for desktop sidebar expansion/collapse
   const toggleDesktopSidebar = () => {
-    console.log('toggleDesktopSidebar')
     setIsSidebarExpanded(!isSidebarExpanded);
     if (logoRef.current && toggleButtonRef.current) {
       logoRef.current.style.display = 'flex';
@@ -152,7 +148,6 @@ const Sidebar: React.FC = () => {
 
   // Toggle function for mobile sidebar open/close
   const toggleMobileSidebar = () => {
-    console.log('toggleMobileSidebar')
     setIsMobileSidebarOpen(!isMobileSidebarOpen);
   };
 

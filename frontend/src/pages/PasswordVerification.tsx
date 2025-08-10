@@ -32,12 +32,9 @@ const PasswordVerificationModal = () => {
                 },
                 body: JSON.stringify({ password }),
             });
-            console.log('response', response);
             if (response.ok) {
-                console.log('response', response);
                 const data = await response.json();
                 const token = data.data.token;
-                // window.location.href = `${API_BASE}/proxy/r/${short}/protected/${token}`;
                 window.location.replace(`${API_BASE}/proxy/r/${short}/protected/${token}`);
                 return;
             }

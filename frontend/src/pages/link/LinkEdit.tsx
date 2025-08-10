@@ -80,9 +80,7 @@ const LinkEdit = () => {
     // Populate fields when data is loaded
     useEffect(() => {
         if (linkData?.status === 'success' && linkData.data) {
-            console.log('linkData', linkData.data)
             const { original_url, short_link, expiry_date, scan_link, password, tags, created_at, updated_at, uid, user_uid, is_custom_backoff } = linkData.data
-            console.log('expiry_date', expiry_date)
             setLink({
                 original_url: original_url || '',
                 short_link: short_link || '',
@@ -129,7 +127,6 @@ const LinkEdit = () => {
 
     // Custom handler for expiry date
     const handleExpiryDateChange = (expiry: Date | undefined) => {
-        console.log('handleExpiryDateChange', expiry)
         if (!expiry) {
             setLink(prev => ({
                 ...prev, expiry_date: undefined
@@ -141,7 +138,6 @@ const LinkEdit = () => {
 
     // Custom handler for tags
     const handleTagsChange = useCallback((tags: string[]) => {
-        console.log('handleTagsChange', tags)
         setLink(prev => ({ ...prev, tags }))
     }, [])
 
@@ -185,7 +181,6 @@ const LinkEdit = () => {
             setError('Please fill in all required fields.')
             return
         }
-        console.log('link', link)
         updateLink({
             path: `/links/${urlId}`,
             method: 'PUT',
