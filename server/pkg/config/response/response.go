@@ -95,6 +95,14 @@ func SendNotFoundError(c *gin.Context, message string) {
 	})
 }
 
+// 409 with error
+func SendConflictError(c *gin.Context, message string) {
+	c.AbortWithStatusJSON(http.StatusConflict, gin.H{
+		"status": "error",
+		"error":  message,
+	})
+}
+
 // 500 with error
 func SendServerError(c *gin.Context, err error) {
 	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
