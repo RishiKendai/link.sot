@@ -55,7 +55,7 @@ type Stats = {
   hide: string[];
 }
 
-const WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'N/A']
 const URL_DOMAIN = import.meta.env.VITE_URL_DOMAIN
 
 const Dashboard: React.FC = () => {
@@ -83,16 +83,22 @@ const Dashboard: React.FC = () => {
   }
 
   const getCityCountry = (city: string, country: string) => {
-    if (city === 'Unknown' && country === 'Unknown') {
-      return 'N/A'
-    }
-    return `${city}, ${country}`
-  }
+    const c1 = city && city !== 'Unknown';
+    const c2 = country && country !== 'Unknown';
+
+    if (!c1 && !c2) return 'N/A';
+    if (c1 && !c2) return city;
+    if (!c1 && c2) return country;
+    return `${city}, ${country}`;
+  };
 
   const getOSDevice = (os: string, device: string) => {
-    if (os === 'Unknown' && device === 'Unknown') {
-      return 'N/A'
-    }
+    const o1 = os && os !== 'Unknown';
+    const d1 = device && device !== 'Unknown';
+
+    if (!o1 && !d1) return 'N/A';
+    if (o1 && !d1) return os;
+    if (!o1 && d1) return device;
     return `${os}, ${device}`
   }
 
@@ -133,7 +139,7 @@ const Dashboard: React.FC = () => {
                           </div>
                         </>
                       ) : (
-                        <div className='flex flex-col items-center justify-center h-full bg-[var(--empty-bg)] rounded-2xl'>
+                        <div className='flex flex-col text-center items-center justify-center h-full bg-[var(--empty-bg)] rounded-2xl p-8'>
                           <h5 className='text-2xl font-black mb-2'>Oops! Looks like you have no links yet.</h5>
                           <p className='text-gray-600 tex-xl mb-4'>Create a link by clicking the button below to get started.</p>
                           <Button label='Create new link' className='gpb' onClick={() => navigate('/links/create')} isPending={false} />
@@ -149,7 +155,7 @@ const Dashboard: React.FC = () => {
                     </div>
 
                     <div className='space-y-4'>
-                      <StatsCard Icon={IconGlobeWWW} iconClass='grc' title='Most popular browser' value={dState.stats.top_browser} />
+                      <StatsCard Icon={IconGlobeWWW} iconClass='grc' title='Most popular browser' value={dState.stats.top_browser || 'N/A'} />
                       <StatsCard Icon={IconMapPin} iconClass='gpb' title='Leading country by traffic' value={getCityCountry(dState.stats.top_city, dState.stats.top_country)} />
                       <StatsCard Icon={IconCalendar} iconClass='gct' title='Peak day for visits' value={WEEK[dState.stats.top_day_of_week]} />
                       <StatsCard Icon={IconDevice} iconClass='gin' title='Primary device type' value={getOSDevice(dState.stats.top_os, dState.stats.top_device)} />
@@ -172,7 +178,7 @@ const Dashboard: React.FC = () => {
                       <li className="feature-item">Professional appearance for your links</li>
                     </ul>
                     {/* <Button label='Contact Admin' className='gsbb' onClick={() => navigate('/settings/custom-domain')} isPending={false} /> */}
-                    <span className='txt-2 text-sm'>To set this up for your company, please contact <a href={`mailto:admin.linksot@gmail.com`} className='text-sky-400 hover:underline hover:text-blue-800 transition-colors'>admin</a> or mail to admin.linksot@gmail.com</span>
+                    <span className='txt-2 text-sm'>To set this up for your company, please contact <a href={`mailto:query.linksot@gmail.com`} className='text-sky-400 hover:underline hover:text-blue-800 transition-colors'>admin</a> or mail to query.linksot@gmail.com</span>
                   </div>
                   {/* API Integration */}
                   <div className='polished-card border-silver p-5 flex flex-col'>
@@ -182,10 +188,9 @@ const Dashboard: React.FC = () => {
                       </span>
                       <h5 className='text-xl font-semibold'>API Integration</h5>
                     </div>
-                    <p className='txt-2 text-sm'>Integrate URL shortening directly into your applications with our powerful API. Generate short URLs, access link data, and view detailed analytics programmatically.</p>
+                    <p className='txt-2 text-sm'>Integrate URL shortening directly into your applications with our powerful API. Generate short URLs, access link data programmatically.</p>
                     <ul className="feature-list">
                       <li className="feature-item">Generate short URLs programmatically</li>
-                      <li className="feature-item">Bulk URL shortening capabilities</li>
                       <li className="feature-item">Comprehensive documentation included</li>
                     </ul>
                     <Button label='Start Integrating' className='ml-auto gsbb' onClick={() => navigate('/settings')} isPending={false} />

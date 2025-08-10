@@ -1,9 +1,11 @@
 package dashboard
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/RishiKendai/sot/pkg/config/response"
 	"github.com/RishiKendai/sot/pkg/database/postgres"
@@ -101,12 +103,12 @@ func fetchDashboardData(uid string) DashboardStruct {
 					recent.deleted,
 
 					(SELECT COUNT(*) FROM clicks) AS total_clicks,
-					(SELECT day_of_week FROM clicks GROUP BY day_of_week ORDER BY COUNT(*) DESC LIMIT 1) AS top_day_of_week,
-					(SELECT city FROM clicks GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1) AS top_city,
-					(SELECT country FROM clicks GROUP BY country ORDER BY COUNT(*) DESC LIMIT 1) AS top_country,
-					(SELECT browser FROM clicks GROUP BY browser ORDER BY COUNT(*) DESC LIMIT 1) AS top_browser,
-					(SELECT operating_system FROM clicks GROUP BY operating_system ORDER BY COUNT(*) DESC LIMIT 1) AS top_os,
-					(SELECT device_type FROM clicks GROUP BY device_type ORDER BY COUNT(*) DESC LIMIT 1) AS top_device
+					COALESCE((SELECT day_of_week FROM clicks GROUP BY day_of_week ORDER BY COUNT(*) DESC LIMIT 1), 7) AS top_day_of_week,
+					COALESCE((SELECT city FROM clicks GROUP BY city ORDER BY COUNT(*) DESC LIMIT 1), 'N/A') AS top_city,
+					COALESCE((SELECT country FROM clicks GROUP BY country ORDER BY COUNT(*) DESC LIMIT 1), 'N/A') AS top_country,
+					COALESCE((SELECT browser FROM clicks GROUP BY browser ORDER BY COUNT(*) DESC LIMIT 1), 'N/A') AS top_browser,
+					COALESCE((SELECT operating_system FROM clicks GROUP BY operating_system ORDER BY COUNT(*) DESC LIMIT 1), 'N/A') AS top_os,
+					COALESCE((SELECT device_type FROM clicks GROUP BY device_type ORDER BY COUNT(*) DESC LIMIT 1), 'N/A') AS top_device
 
 					FROM recent
 					LIMIT 1;
@@ -116,7 +118,25 @@ func fetchDashboardData(uid string) DashboardStruct {
 			fmt.Printf("Error getting stats: %v\n", err)
 			return
 		}
-		var stats Stats
+		stats := Stats{
+			User_uid:          uid,
+			Uid:               "",
+			Original_url:      "",
+			Short_link:        "",
+			Is_custom_backoff: false,
+			Created_at:        time.Time{},
+			Expiry_date:       time.Time{},
+			Password:          nil,
+			Scan_link:         false,
+			Is_flagged:        false,
+			Updated_at:        time.Time{},
+			Tags:              []string{},
+			Deleted:           false,
+			TotalClicks:       0,
+			Top_day_of_week:   7,
+			Top_city:          "",
+			Top_country:       "",
+		}
 		var tagsJSON []byte
 		if scanErr := row.Scan(
 			&stats.User_uid,
@@ -139,6 +159,10 @@ func fetchDashboardData(uid string) DashboardStruct {
 			&stats.Top_browser,
 			&stats.Top_os,
 			&stats.Top_device); scanErr != nil {
+			if scanErr == sql.ErrNoRows {
+				fmt.Println("No rows found")
+				recentLinkStatsCh <- stats
+			}
 			fmt.Printf("Error scanning stats: %v\n", scanErr)
 			return
 		}

@@ -10,7 +10,7 @@ import (
 func fetchTopPerformingLinks(wg *sync.WaitGroup, ch chan<- []TopPerformingLink, mu *sync.Mutex, errs *[]error, userUID string, startDate, endDate string) {
 	defer wg.Done()
 	defer close(ch)
-	var topLinks []TopPerformingLink
+	topLinks := []TopPerformingLink{}
 
 	r, err := postgres.FindMany(`
 		SELECT
@@ -52,7 +52,7 @@ func fetchTopPerformingLinks(wg *sync.WaitGroup, ch chan<- []TopPerformingLink, 
 func fetchRecentActivity(wg *sync.WaitGroup, ch chan<- []RecentActivity, mu *sync.Mutex, errs *[]error, userUID, startDate, endDate string) {
 	defer wg.Done()
 	defer close(ch)
-	var recentActivities []RecentActivity
+	recentActivities := []RecentActivity{}
 
 	r, err := postgres.FindMany(`
 		SELECT

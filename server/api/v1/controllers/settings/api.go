@@ -83,7 +83,7 @@ func GetAPIKeys() gin.HandlerFunc {
 			response.SendServerError(c, errors.New("invalid request. uid is required"))
 			return
 		}
-		var keys []api.APIKey
+		keys := []api.APIKey{}
 		fmt.Println("uid", uid)
 		apiKeysDoc, err := mongodb.FindMany("api_keys", bson.M{"uid": uid})
 		if err != nil {
