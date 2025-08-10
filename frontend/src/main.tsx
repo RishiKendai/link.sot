@@ -26,6 +26,7 @@ const PasswordVerification = lazyLoad(() => import('./pages/PasswordVerification
 const LinkDetails = lazyLoad(() => import('./pages/link/LinkDetails.tsx'))
 const ErrorPage = lazyLoad(() => import('./pages/ErrorPage.tsx'))
 const Settings = lazyLoad(() => import('./pages/settings/Settings.tsx'))
+const ApiDocs = lazyLoad(() => import('./pages/ApiDocs.tsx'))
 
 
 
@@ -93,7 +94,8 @@ const router = Router([
               { path: 'change-password', element: <Password /> },
               { path: 'integrations/api', element: <API /> }
             ]
-          }
+          },
+
         ]
       }
     ]
@@ -106,6 +108,10 @@ const router = Router([
   {
     path: '/:short/password',
     element: <PasswordVerification />
+  },
+  {
+    path: '/api-docs',
+    element: <ApiDocs />
   }
 ])
 

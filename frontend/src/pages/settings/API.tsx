@@ -61,6 +61,16 @@ const API: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-800 mb-2">API Integration</h1>
           <p className="text-gray-600 mb-4">Manage your API keys and settings here.</p>
         </div>
+        <div className="p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+          <h2 className="text-blue-800 text-xl font-semibold mb-2">Want to Integrate with Our API?</h2>
+          <p className="text-blue-900 mb-4 text-sm">
+            Access our developer-friendly API documentation to learn how to authenticate, retrieve data, and start building powerful integrations in minutes.
+          </p>
+          <a href="/api-docs" target='_blank' rel='noreferrer noopener'
+            className="inline-block text-sm px-5 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition">
+            View API Documentation
+          </a>
+        </div>
         {/* API Creation */}
         <div>
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Create API Key</h2>
