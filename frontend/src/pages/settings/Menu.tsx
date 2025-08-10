@@ -21,6 +21,7 @@ const Menu: React.FC<MenuProps> = ({ setCurrent, onItemClick, currentSetting }) 
                 <h2 className="sidebar-heading">Account</h2>
                 <ul className="space-y-2">
                     <li><button onClick={() => handleClick('My Profile', 'MY_PROFILE')} className={clsx('w-full text-left sidebar-items', currentSetting.id === 'MY_PROFILE' && 'active')}>My Profile</button></li>
+                    <li><button onClick={() => handleClick('Domain', 'DOMAIN')} className={clsx('w-full text-left sidebar-items', currentSetting.id === 'DOMAIN' && 'active')}>Domain</button></li>
                 </ul>
             </li>
             <li>

@@ -24,7 +24,7 @@ export default function Toggle({
         disabled={disabled}
         className={`
           relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200 ease-in-out outline-none
-          ${enabled ? 'bg-green-500 shadow-sm' : 'bg-gray-300'}
+          ${enabled ? 'bg-[var(--clr-secondary)] shadow-sm' : 'bg-gray-300'}
           ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-md'}
         `}
       >

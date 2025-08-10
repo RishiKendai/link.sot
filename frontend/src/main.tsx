@@ -13,6 +13,7 @@ import LinkAnalytics from './pages/link/LinkAnalytics.tsx'
 import Profile from './pages/settings/Profile.tsx'
 import Password from './pages/settings/Password.tsx'
 import API from './pages/settings/API.tsx'
+import Domain from './pages/settings/Domain.tsx'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const App = lazyLoad(() => import('./pages/App.tsx'))
@@ -91,6 +92,7 @@ const router = Router([
             children: [
               { index: true, element: <Navigate to="profile" replace /> }, // default redirect
               { path: 'profile', element: <Profile /> },
+              {path: 'domain', element:<Domain />},
               { path: 'change-password', element: <Password /> },
               { path: 'integrations/api', element: <API /> }
             ]

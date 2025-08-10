@@ -2,9 +2,11 @@ package settings
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/RishiKendai/sot/pkg/config/env"
 	"github.com/RishiKendai/sot/pkg/config/response"
 	"github.com/RishiKendai/sot/pkg/database/postgres"
 	rdb "github.com/RishiKendai/sot/pkg/database/redis"
@@ -134,5 +136,85 @@ func UpdatePassword() gin.HandlerFunc {
 			"message": "Password updated successfully",
 		})
 
+	}
+}
+
+func GetDomain() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Get payload
+		uid := c.GetString("uid")
+		if uid == "" {
+			response.SendServerError(c, errors.New("invalid request. uid is required"))
+			return
+		}
+
+		// Get domain from postgres
+		r, err := postgres.FindOne("SELECT subdomain, use_subdomain FROM users WHERE uid = $1", uid)
+		if err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+		var subdomain string
+		var useSubdomain bool
+		err = r.Scan(&subdomain, &useSubdomain)
+		if err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+		// build domain
+		var sd *string
+		rd := env.EnvSOTDomain()
+		if subdomain != "" {
+			d := fmt.Sprintf("%s.%s", subdomain, rd)
+			sd = &d
+		} else {
+			sd = nil
+		}
+
+		// send response
+		response.SendJSON(c, gin.H{
+			"domain":        rd,
+			"subdomain":     sd,
+			"use_subdomain": useSubdomain,
+		})
+	}
+}
+
+func UpdateDomainSettings() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Get payload
+		uid := c.GetString("uid")
+		if uid == "" {
+			response.SendServerError(c, errors.New("invalid request. uid is required"))
+			return
+		}
+		var payload struct {
+			Use_subdomain bool `json:"use_subdomain"`
+		}
+		if err := c.ShouldBindJSON(&payload); err != nil {
+			response.SendBadRequestError(c, "Invalid request body")
+			return
+		}
+
+		// update in postgres
+		res, err := postgres.UpdateOne("UPDATE users SET use_subdomain = $1 WHERE uid = $2", payload.Use_subdomain, uid)
+		if err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+		rowsAffected, err := res.RowsAffected()
+		if err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+		if rowsAffected == 0 {
+			response.SendBadRequestError(c, "User not found")
+			return
+		}
+
+		// send response
+		response.SendJSON(c, gin.H{
+			"message": "Domain settings updated successfully",
+		})
 	}
 }

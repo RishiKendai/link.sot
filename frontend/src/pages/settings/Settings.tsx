@@ -14,6 +14,7 @@ const Settings = () => {
   const getCurrentTab = React.useCallback(() => {
     if (location.pathname.includes('change-password')) return { id: 'CHANGE_PASSWORD', label: 'Change Password' };
     if (location.pathname.includes('integrations/api')) return { id: 'API', label: 'API' };
+    if (location.pathname.includes('domain')) return { id: 'DOMAIN', label: 'Domain' };
     return { id: 'MY_PROFILE', label: 'My Profile' };
   }, [location.pathname]);
 
@@ -115,6 +116,8 @@ const getPathForSetting = (id: string) => {
   switch (id) {
     case 'MY_PROFILE':
       return 'profile';
+    case 'DOMAIN':
+      return 'domain';
     case 'CHANGE_PASSWORD':
       return 'change-password';
     case 'API':

@@ -9,7 +9,8 @@ import (
 func Settings(router *gin.RouterGroup) {
 	// Profile
 	router.PUT("/profile", services.Authenticate(), settings.UpdateProfile())
-
+	router.GET("/domain", services.Authenticate(), settings.GetDomain())
+	router.PUT("/domain", services.Authenticate(), settings.UpdateDomainSettings())
 	// Security
 	router.PUT("/password", services.Authenticate(), settings.UpdatePassword())
 
