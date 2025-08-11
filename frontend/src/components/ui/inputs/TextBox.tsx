@@ -1,5 +1,5 @@
 import React, { type ReactElement } from 'react';
-import './TextBox.css';
+import './textBox.css';
 import clsx from 'clsx';
 
 interface TextBoxProps {
