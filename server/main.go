@@ -63,5 +63,12 @@ func main() {
 		})
 	})
 
+	router.NoRoute(func(c *gin.Context) {
+		domain := env.GetEnvKey("APP_DOMAIN")
+		c.HTML(http.StatusNotFound, "404.html", gin.H{
+			"Domain": domain,
+		})
+	})
+
 	router.Run("localhost:" + port)
 }

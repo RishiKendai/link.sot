@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>link.sot | Page Not Found</title>
+        <link rel="icon" type="image/svg+xml" href="/assets/images/logo.svg" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+            rel="stylesheet">
+
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+        <style>
+            :root {
+                font-family: "Inter", sans-serif;
+            }
+
+            @keyframes bounce {
+
+                0%,
+                20%,
+                50%,
+                80%,
+                100% {
+                    transform: translateY(0);
+                }
+
+                40% {
+                    transform: translateY(-10px);
+                }
+
+                60% {
+                    transform: translateY(-5px);
+                }
+            }
+
+            .animate-bounce {
+                animation: bounce 1s infinite;
+            }
+
+            .animate-bounce-delay-1 {
+                animation-delay: 150ms;
+            }
+
+            .animate-bounce-delay-2 {
+                animation-delay: 300ms;
+            }
+
+        </style>
+    </head>
+
+    <body
+        class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+        <div class="max-w-md w-full text-center">
+            <!-- 404 Number -->
+            <div class="mb-8">
+                <h1
+                    class="text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 leading-none">
+                    404
+                </h1>
+            </div>
+
+            <!-- Main Message -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">
+                    Page Not Found
+                </h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Oops! The page you're looking for doesn't exist. It might have been moved, deleted, or you entered
+                    the wrong URL.
+                </p>
+            </div>
+
+            <!-- Domain Link Message -->
+            <div class="mb-8">
+                <p class="text-gray-600 text-center">
+                    Use <a href="https://{{.Domain}}"
+                        class="text-blue-600 hover:text-blue-700 underline font-medium transition-colors duration-300">{{.Domain}}</a>
+                    to create short links
+                </p>
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="flex justify-center space-x-2">
+                <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce animate-bounce-delay-1"></div>
+                <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce animate-bounce-delay-2"></div>
+            </div>
+        </div>
+    </body>
+
+</html>
