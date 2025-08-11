@@ -20,7 +20,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		// 	// Fallback to localhost for development
 		// 	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
 		// }
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "https://app.linksot.space")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Location")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
