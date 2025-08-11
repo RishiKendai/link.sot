@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import './datePicker.css';
+import './datepicker.css';
 import IconClock from '../icons/IconClock';
 
 interface DatePickerProps {
