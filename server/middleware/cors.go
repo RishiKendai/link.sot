@@ -27,6 +27,12 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Strict-Origin-When-Cross-Origin", "true")
 		c.Writer.Header().Set("Access-Control-Expose-Headers", "Location")
 
+		if c.Request.Method == "OPTIONS" {
+			// OPTIONS requests are preflight, respond immediately with status 204 No Content
+			c.AbortWithStatus(204)
+			return
+		}
+
 		c.Next()
 	}
 }
