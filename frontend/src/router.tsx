@@ -20,7 +20,7 @@ const LinkEdit = lazyLoad(() => import("./pages/link/LinkEdit"));
 const LinkCreate = lazyLoad(() => import("./pages/link/LinkCreate"));
 const LinkDetails = lazyLoad(() => import("./pages/link/LinkDetails"));
 const LinkAnalytics = lazyLoad(() => import("./pages/link/LinkAnalytics"));
-const Analytics = lazyLoad(() => import("./pages/analytics/Index"));
+const Analytics = lazyLoad(() => import("./pages/analytics/Analytics"));
 const Settings = lazyLoad(() => import("./pages/settings/Settings"));
 
 const router = createBrowserRouter([
