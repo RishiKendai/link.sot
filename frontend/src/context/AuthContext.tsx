@@ -41,7 +41,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setAuthenticated(true);
                     setUser({ name: data.name, email: data.email });
                     if (window.location.pathname === '/') {
-                        // window.history.pushState({}, '', '/links')
                         navigate('/links', { replace: true })
                     }
                 } else if (res.status === 401 && responseData.error === 'session_expired') {
