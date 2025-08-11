@@ -242,9 +242,9 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		rdb.RC.Set(sc, payload.Original_url, &redisExpiry)
 
 		// Return full short URL
-		base := env.GetEnvKey("FE_BASE_URL")
+		base := env.GetEnvKey("SERVER_DOMAIN")
 		if base == "" {
-			log.Fatal("FE_BASE_URL is not set")
+			log.Fatal("SERVER_DOMAIN is not set")
 		}
 		shortURL := fmt.Sprintf("%s/%s", strings.TrimRight(base, "/"), sc)
 
@@ -356,9 +356,9 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		}
 		rdb.RC.Set(newShortCode, payload.Original_url, &redisExpiry)
 
-		base := env.GetEnvKey("FE_BASE_URL")
+		base := env.GetEnvKey("SERVER_DOMAIN")
 		if base == "" {
-			log.Fatalf("FE_BASE_URL is not set")
+			log.Fatalf("SERVER_DOMAIN is not set")
 		}
 
 		c.JSON(http.StatusOK, gin.H{

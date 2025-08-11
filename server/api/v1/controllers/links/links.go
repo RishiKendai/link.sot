@@ -84,10 +84,6 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		}
 		rdb.RC.Set(sc, payload.Original_url, &redisExpiry)
 
-		base := env.GetEnvKey("FE_BASE_URL")
-		if base == "" {
-			log.Fatalf("FE_BASE_URL is not set")
-		}
 		response.SendJSON(c, bson.M{
 			"short_code": sc,
 		})
@@ -558,13 +554,8 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		// Set new entry in Redis
 		rdb.RC.Set(newShortLink, payload.Original_url, &redisExpiry)
 
-		base := env.GetEnvKey("FE_BASE_URL")
-		if base == "" {
-			log.Fatalf("FE_BASE_URL is not set")
-		}
-
 		response.SendJSON(c, bson.M{
-			"short_link": base + "/api/v1/links/" + newShortLink,
+			"short_link": newShortLink,
 			"message":    "Link updated successfully",
 		})
 	}

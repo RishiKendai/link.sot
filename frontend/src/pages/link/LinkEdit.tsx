@@ -11,7 +11,7 @@ import { useApiMutation } from '../../hooks/useApiMutation'
 import { useQueryClient } from '@tanstack/react-query'
 import Alert from '../../components/ui/Alert'
 
-const baseURL = import.meta.env.VITE_APP_DOMAIN
+const baseURL = import.meta.env.VITE_SERVER_DOMAIN
 
 /*
 created_at
@@ -191,7 +191,7 @@ const LinkEdit = () => {
                 if (typeof res === 'object' && res !== null && 'status' in res && res.status === 'success' && 'data' in res && res.data && typeof res.data === 'object' && 'short_link' in res.data) {
                     // Invalidate and refetch links
                     queryClient.invalidateQueries({ queryKey: ['links'] })
-                    navigate(`/links/${link.short_link}/details`, { state: { status: 'UPDATED', replace: true } })
+                    navigate(`/links/${res.data.short_link}/details`, { state: { status: 'UPDATED', replace: true } })
                 } else if (typeof res === 'object' && res !== null && 'message' in res && typeof (res as { message?: unknown }).message === 'string') {
                     setError((res as { message?: string }).message || 'Failed to update link.')
                 } else {
