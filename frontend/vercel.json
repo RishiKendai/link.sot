@@ -1,8 +1,12 @@
 {
-    "rewrites": [
-        {
-            "source": "/proxy/(.*)",
-            "destination": "https://sotly-backend.onrender.com/api/v1/$1"
-        }
-    ]
+  "rewrites": [
+    {
+      "source": "/proxy/(.*)",
+      "destination": "https://linksot.space/api/v1/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
 }
