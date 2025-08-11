@@ -16,7 +16,7 @@ export interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-// const API_BASE = import.meta.env.VITE_APP_DOMAIN || '';
+const API_BASE = import.meta.env.VITE_APP_DOMAIN || '';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const checkAuthStatus = async () => {
             try {
 
-                const res = await fetch(`/proxy/auth-status`, {
+                const res = await fetch(`${API_BASE}/proxy/auth-status`, {
                     method: 'GET',
                     credentials: 'include',
                 });
