@@ -6,7 +6,6 @@ type CreateShortURLPayload struct {
 	Original_url   string    `json:"original_url"`
 	Expiry_date    time.Time `json:"expiry_date"`
 	Password       *string   `json:"password"`
-	Scan_link      bool      `json:"scan_link"`
 	Is_flagged     bool      `json:"is_flagged"`
 	Custom_backoff string    `json:"custom_backoff"`
 	Tags           []string  `json:"tags"`
@@ -25,7 +24,6 @@ type Link struct {
 	Created_at        time.Time `json:"created_at"`
 	Expiry_date       time.Time `json:"expiry_date"`
 	Password          *string   `json:"password"`
-	Scan_link         bool      `json:"scan_link"`
 	Is_flagged        bool      `json:"is_flagged"`
 	Is_custom_backoff bool      `json:"is_custom_backoff"`
 	Updated_at        time.Time `json:"updated_at"`

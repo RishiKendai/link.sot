@@ -3,7 +3,6 @@ import TextBox from '../../components/ui/inputs/TextBox'
 import Button from '../../components/ui/button/Button'
 import DatePicker from '../../components/ui/datepicker/DatePicker'
 import IconCalendar from '../../components/ui/icons/IconCalendar'
-import Checkbox from '../../components/ui/inputs/Checkbox'
 import ChipInput from '../../components/ui/inputs/ChipInput'
 import Toggle from '../../components/ui/Toggle'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -21,7 +20,6 @@ is_custom_backoff
 is_flagged
 original_url
 password
-scan_link
 short_link
 tags
 uid
@@ -35,7 +33,6 @@ type LinkState = {
     original_url: string;
     short_link: string;
     expiry_date?: Date | undefined;
-    scan_link: boolean;
     custom_backoff: string;
     password: string;
     tags: string[];
@@ -50,7 +47,6 @@ const initialLinkState: LinkState = {
     original_url: '',
     short_link: '',
     expiry_date: undefined,
-    scan_link: false,
     custom_backoff: '',
     password: '',
     tags: [],
@@ -80,12 +76,11 @@ const LinkEdit = () => {
     // Populate fields when data is loaded
     useEffect(() => {
         if (linkData?.status === 'success' && linkData.data) {
-            const { original_url, short_link, expiry_date, scan_link, password, tags, created_at, updated_at, uid, user_uid, is_custom_backoff } = linkData.data
+            const { original_url, short_link, expiry_date,  password, tags, created_at, updated_at, uid, user_uid, is_custom_backoff } = linkData.data
             setLink({
                 original_url: original_url || '',
                 short_link: short_link || '',
                 expiry_date: expiry_date ? new Date(expiry_date) : undefined,
-                scan_link: !!scan_link,
                 custom_backoff: short_link || '',
                 password: password || '',
                 tags: Array.isArray(tags) ? tags : [],
@@ -189,7 +184,6 @@ const LinkEdit = () => {
                 custom_backoff: isCustomBackoffEnabled ? link.custom_backoff : '',
                 expiry_date: link.expiry_date ? link.expiry_date.toISOString() : undefined,
                 password: isPasswordEnabled ? link.password : null,
-                scan_link: link.scan_link,
                 tags: link.tags,
             },
         }, {
@@ -335,14 +329,6 @@ const LinkEdit = () => {
                                 disabled={isFetching || isUpdating}
                                 error={fieldErrors.tags}
                                 maxChips={10}
-                            />
-                        </div>
-                        <div className="card-item">
-                            <Checkbox
-                                label='Enable Protection (Auto scan for malicious email)'
-                                id='scan-link'
-                                checked={link.scan_link}
-                                onChange={handleInputChange}
                             />
                         </div>
                     </div>

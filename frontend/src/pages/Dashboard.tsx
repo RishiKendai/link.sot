@@ -43,7 +43,6 @@ type Stats = {
   original_url: string;
   full_short_link: string;
   password: string;
-  scan_link: boolean;
   short_link: string;
   tags: string[];
   top_browser: string;

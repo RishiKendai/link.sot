@@ -4,7 +4,6 @@ import TextBox from '../../components/ui/inputs/TextBox'
 import Button from '../../components/ui/button/Button'
 import DatePicker from '../../components/ui/datepicker/DatePicker'
 import IconCalendar from '../../components/ui/icons/IconCalendar'
-import Checkbox from '../../components/ui/inputs/Checkbox'
 import ChipInput from '../../components/ui/inputs/ChipInput'
 import { useApiMutation } from '../../hooks/useApiMutation'
 import { useNavigate } from 'react-router-dom'
@@ -17,7 +16,6 @@ const LinkCreate = () => {
     const [customBackHalf, setCustomBackHalf] = useState('')
     const [expiryDate, setExpiryDate] = useState<Date | undefined>()
     const [showCalendar, setShowCalendar] = useState(false)
-    const [scanLink, setScanLink] = useState(false)
     const [password, setPassword] = useState('')
     const [tags, setTags] = useState<string[]>([])
     const [formError, setFormError] = useState<Record<string, string>>({})
@@ -55,7 +53,6 @@ const LinkCreate = () => {
                 custom_backoff: customBackHalf,
                 expiry_date: expiryDate ? expiryDate.toISOString() : undefined,
                 password: password || undefined,
-                scan_link: scanLink,
                 tags: tags,
             },
         }, {
@@ -173,14 +170,6 @@ const LinkCreate = () => {
                                 initialValues={tags}
                                 onValuesChange={setTags}
                                 maxChips={10}
-                            />
-                        </div>
-                        <div className="card-item">
-                            <Checkbox
-                                label='Enable Protection (Auto scan for malicious email)'
-                                id='scan-link'
-                                checked={scanLink}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setScanLink(e.target.checked)}
                             />
                         </div>
                     </div>

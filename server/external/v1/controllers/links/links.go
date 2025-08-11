@@ -77,7 +77,7 @@ func GetLinksHandler() gin.HandlerFunc {
 		go func() {
 			defer wg.Done()
 			query := `SELECT uid, user_uid, original_link, short_link, is_custom_backoff, created_at, expiry_date,
-				password, scan_link, is_flagged, updated_at, tags
+				password, is_flagged, updated_at, tags
 				FROM links 
 				WHERE user_uid = $1 AND deleted = false 
 				ORDER BY created_at DESC 
@@ -96,7 +96,7 @@ func GetLinksHandler() gin.HandlerFunc {
 				if err := rows.Scan(
 					&link.Uid, &link.User_uid, &link.Original_url, &link.Short_link,
 					&link.Is_custom_backoff, &link.Created_at, &link.Expiry_date,
-					&link.Password, &link.Scan_link, &link.Is_flagged, &link.Updated_at,
+					&link.Password, &link.Is_flagged, &link.Updated_at,
 					&tagsJSON,
 				); err != nil {
 					errs <- err
@@ -209,8 +209,8 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		// Prepare insert query
 		query := `
 			INSERT INTO links 
-			(user_uid, original_link, short_link, expiry_date, password, scan_link, is_flagged, is_custom_backoff, tags)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			(user_uid, original_link, short_link, expiry_date, password, is_flagged, is_custom_backoff, tags)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		`
 
 		_, err := postgres.InsertOne(
@@ -220,7 +220,6 @@ func CreateShortURLHandler() gin.HandlerFunc {
 			sc,
 			expiry,
 			payload.Password,
-			payload.Scan_link,
 			payload.Is_flagged,
 			isCustom,
 			payload.Tags,
@@ -277,7 +276,7 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		var existingLink Link
 		var tagsJSON []byte
 		sqlRow, err := postgres.FindOne(
-			"SELECT uid, original_link, short_link, is_custom_backoff, created_at, expiry_date, password, scan_link, is_flagged, updated_at, tags FROM links WHERE short_link = $1 AND user_uid = $2 AND deleted = false",
+			"SELECT uid, original_link, short_link, is_custom_backoff, created_at, expiry_date, password, is_flagged, updated_at, tags FROM links WHERE short_link = $1 AND user_uid = $2 AND deleted = false",
 			shortCode, uid,
 		)
 		if err != nil {
@@ -286,7 +285,7 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		}
 		err = sqlRow.Scan(&existingLink.Uid, &existingLink.Original_url, &existingLink.Short_link,
 			&existingLink.Is_custom_backoff, &existingLink.Created_at, &existingLink.Expiry_date, &existingLink.Password,
-			&existingLink.Scan_link, &existingLink.Is_flagged, &existingLink.Updated_at, &tagsJSON,
+			&existingLink.Is_flagged, &existingLink.Updated_at, &tagsJSON,
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -339,8 +338,8 @@ func UpdateLinkHandler() gin.HandlerFunc {
 		}
 
 		_, err = postgres.UpdateOne(
-			"UPDATE links SET original_link = $1, short_link = $2, expiry_date = $3, password = $4, scan_link = $5, is_flagged = $6, is_custom_backoff = $7, updated_at = NOW(), tags = $8 WHERE short_link = $9 AND user_uid = $10",
-			payload.Original_url, newShortCode, expiry, payload.Password, payload.Scan_link, payload.Is_flagged, isCustom, payload.Tags, existingLink.Short_link, uid,
+			"UPDATE links SET original_link = $1, short_link = $2, expiry_date = $3, password = $4, is_flagged = $5, is_custom_backoff = $6, updated_at = NOW(), tags = $7 WHERE short_link = $8 AND user_uid = $9",
+			payload.Original_url, newShortCode, expiry, payload.Password, payload.Is_flagged, isCustom, payload.Tags, existingLink.Short_link, uid,
 		)
 		if err != nil {
 			response.SendServerError(c, err)

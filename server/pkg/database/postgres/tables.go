@@ -34,7 +34,6 @@ func createLinks() error {
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			expiry_date TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL '30 days'),
 			password VARCHAR(255) DEFAULT NULL,
-			scan_link BOOLEAN DEFAULT FALSE,
 			is_flagged BOOLEAN DEFAULT FALSE,
 			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			tags JSONB DEFAULT '[]'::jsonb,

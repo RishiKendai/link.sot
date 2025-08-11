@@ -11,6 +11,7 @@ type Link = {
     title: string;
     original_url: string;
     short_link: string;
+    full_short_link: string;
     tags: string[];
     created_at: Date;
     expiry_date: Date;
@@ -72,7 +73,7 @@ const LinkDetails: React.FC = () => {
                                         <>
                                             {status === 'CREATED' && <Alert type='success' className='mb-6' message='Link created successfully!' />}
                                             {status === 'UPDATED' && <Alert type='success' className='mb-6' message='Link updated successfully!' />}
-                                           <LinkCard link={link}  />
+                                           <LinkCard link={link}   />
                                         </>
                                     )
                             }

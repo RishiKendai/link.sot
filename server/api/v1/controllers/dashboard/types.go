@@ -27,7 +27,6 @@ type Stats struct {
 	Created_at        time.Time `json:"created_at"`
 	Expiry_date       time.Time `json:"expiry_date"`
 	Password          *string   `json:"password"`
-	Scan_link         bool      `json:"scan_link"`
 	Is_flagged        bool      `json:"is_flagged"`
 	Updated_at        time.Time `json:"updated_at"`
 	Tags              []string  `json:"tags"`

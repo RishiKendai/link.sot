@@ -103,7 +103,6 @@ const ApiDocs: React.FC = () => {
                         created_at: { type: 'string', format: 'date-time' },
                         expiry_date: { type: 'string', format: 'date-time' },
                         password: { type: 'string', nullable: true },
-                        scan_link: { type: 'boolean' },
                         is_flagged: { type: 'boolean' },
                         is_custom_backoff: { type: 'boolean' },
                         updated_at: { type: 'string', format: 'date-time' },
@@ -135,7 +134,6 @@ const ApiDocs: React.FC = () => {
                   created_at: '2024-01-15T10:30:00Z',
                   expiry_date: '2024-02-15T10:30:00Z',
                   password: null,
-                  scan_link: true,
                   is_flagged: false,
                   is_custom_backoff: false,
                   updated_at: '2024-01-15T10:30:00Z',
@@ -183,7 +181,6 @@ const ApiDocs: React.FC = () => {
             original_url: { type: 'string', description: 'The original URL to shorten' },
             expiry_date: { type: 'string', format: 'date-time', description: 'Expiration date (optional)' },
             password: { type: 'string', description: 'Password protection (optional)' },
-            scan_link: { type: 'boolean', description: 'Enable link scanning (default: false)' },
             is_flagged: { type: 'boolean', description: 'Mark as flagged (default: false)' },
             custom_backoff: { type: 'string', description: 'Custom short code (optional)' },
             tags: { type: 'array', items: { type: 'string' }, description: 'Tags for organization' }
@@ -193,7 +190,6 @@ const ApiDocs: React.FC = () => {
           original_url: 'https://example.com/very-long-url-that-needs-shortening',
           expiry_date: '2024-12-31T23:59:59Z',
           password: 'secret123',
-          scan_link: true,
           is_flagged: false,
           custom_backoff: 'my-link',
           tags: ['important', 'work']
@@ -268,7 +264,6 @@ const ApiDocs: React.FC = () => {
             original_url: { type: 'string', description: 'The new original URL' },
             expiry_date: { type: 'string', format: 'date-time', description: 'New expiration date' },
             password: { type: 'string', description: 'New password protection' },
-            scan_link: { type: 'boolean', description: 'Enable/disable link scanning' },
             is_flagged: { type: 'boolean', description: 'Mark as flagged' },
             custom_backoff: { type: 'string', description: 'New custom short code' },
             tags: { type: 'array', items: { type: 'string' }, description: 'New tags' }
@@ -278,7 +273,6 @@ const ApiDocs: React.FC = () => {
           original_url: 'https://example.com/updated-url',
           expiry_date: '2024-12-31T23:59:59Z',
           password: 'newpassword',
-          scan_link: true,
           is_flagged: false,
           custom_backoff: 'new-short-code',
           tags: ['updated', 'important']
