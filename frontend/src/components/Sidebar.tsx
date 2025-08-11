@@ -199,7 +199,7 @@ const Sidebar: React.FC = () => {
           ref={sidebarRef}
           className={`
           flex flex-col py-6 px-4 shadow-lg bg-white border-r border-gray-200
-          transition-all duration-300 ease-in-out z-50 overflow-y-auto max-h-screen custom-scroll w-full
+          transition-all duration-300 ease-in-out z-50 overflow-y-auto max-h-screen custom-scroll w-fit
           ${
             // Mobile specific styles: fixed position, slide in/out
             isMobileScreen
