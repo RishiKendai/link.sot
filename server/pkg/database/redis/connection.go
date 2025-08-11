@@ -18,13 +18,16 @@ type redisService struct {
 var RC *redisService
 
 func Connect() {
-	client := redis.NewClient(&redis.Options{
-		Addr:     env.EnvRedisURI(),
-		Username: "admin",
-		Password: env.GetEnvKey("REDIS_PASSWORD"),
-		DB:       0,
-		PoolSize: 100,
-	})
+	// client := redis.NewClient(&redis.Options{
+	// 	Addr:     env.EnvRedisURI(),
+	// 	Username: "admin",
+	// 	Password: env.GetEnvKey("REDIS_PASSWORD"),
+	// 	DB:       0,
+	// 	PoolSize: 100,
+	// })
+
+	opt, _ := redis.ParseURL(env.EnvRedisURI())
+	client := redis.NewClient(opt)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
