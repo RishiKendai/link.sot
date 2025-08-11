@@ -113,7 +113,7 @@ function App() {
               LinkSot empowers you with robust features designed for modern digital campaigns and content sharing.
             </p>
           </div>
-          <div className="max-w-6xl mx-auto feature-cards flex flex-wrap gap-4 justify-center md:justify-between items-center">
+          <div className="max-w-6xl   mx-auto feature-cards flex flex-wrap gap-4 justify-center md:justify-between items-center">
             {
               features.map((feature, index) => (
                 <div key={index} className="feature-card group rounded-lg select-none">

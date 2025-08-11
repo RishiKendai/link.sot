@@ -1,13 +1,16 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from './UseAuth';
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "./UseAuth";
+import PageLoader from '../components/PageLoader';
 
-const ProtectedLayout = () => {
+export default function ProtectedLayout() {
     const { isAuthenticated, isLoading } = useAuth();
-    if (!isAuthenticated && !isLoading) {
-        return <Navigate to="/" replace />;
+    const location = useLocation();
+
+    if (isLoading) return <PageLoader />;
+
+    if (!isAuthenticated) {
+        return <Navigate to="/" replace state={{ from: location }} />;
     }
 
     return <Outlet />;
-};
-
-export default ProtectedLayout;
+}

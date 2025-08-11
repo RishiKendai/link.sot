@@ -32,7 +32,7 @@
   --clr-border: #D6E7F2;
   --ice-blue: #D6EAF3;
   --ice-silver: #EAF4F9;
-   --empty-bg: #e8f0f8;
+  --empty-bg: #e8f0f8;
   /* --bg-secondary: #F3F6FA; */
   --bg-secondary: #F0F4F8;
 
@@ -279,4 +279,14 @@ body {
     border-radius: 8px;
   }
 
+}
+
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
 }
