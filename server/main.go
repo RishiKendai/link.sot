@@ -70,5 +70,5 @@ func main() {
 		})
 	})
 
-	router.Run("localhost:" + port)
+	router.Run(":" + port)
 }
