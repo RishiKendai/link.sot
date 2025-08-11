@@ -32,7 +32,7 @@ type ErrorResponse = {
 export type ResponseProps<T = unknown> = (SuccessResponse<T> ) | (ErrorResponse);
 
 function buildUrl(path: string, queryParams?: Record<string, unknown>): string {
-    path = '/' + path;
+    path = '' + path;
     const url = new URL(path, API_BASE);
     const params = sanitizeData(queryParams || {});
     Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, String(v)));

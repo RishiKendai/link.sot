@@ -43,7 +43,7 @@ export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutation
         mutationFn: async ({ path, method, payload, headers }: RequestParams<TPayload>) => {
             const BASE_URL = import.meta.env.VITE_API_DOMAIN;
             // const BASE_URL = import.meta.env.VITE_SERVER_DOMAIN;
-            const url = `${BASE_URL}/${path}`;
+            const url = `${BASE_URL}${path}`;
             // const url = `${BASE_URL}${path}`;
             try {
                 const response = await fetch(url, {
