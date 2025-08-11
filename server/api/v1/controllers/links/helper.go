@@ -268,9 +268,9 @@ func buildShortLinkURL(userUID, shortLink string) (string, error) {
 	}
 
 	// Get SOT domain from environment
-	sotDomain := os.Getenv("SOT_DOMAIN")
+	sotDomain := os.Getenv("SERVER_DOMAIN")
 	if sotDomain == "" {
-		panic("SOT_DOMAIN is not set")
+		panic("SERVER_DOMAIN is not set")
 	}
 
 	// Build URL based on subdomain settings
@@ -350,9 +350,9 @@ func buildShortLinkURLsBatch(links []Link) error {
 	}
 
 	// Get SOT domain from environment
-	sotDomain := os.Getenv("SOT_DOMAIN")
+	sotDomain := os.Getenv("SERVER_DOMAIN")
 	if sotDomain == "" {
-		panic("SOT_DOMAIN is not set")
+		panic("SERVER_DOMAIN is not set")
 	}
 
 	// Build URLs for all links

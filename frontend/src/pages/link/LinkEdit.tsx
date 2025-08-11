@@ -11,7 +11,7 @@ import { useApiMutation } from '../../hooks/useApiMutation'
 import { useQueryClient } from '@tanstack/react-query'
 import Alert from '../../components/ui/Alert'
 
-const baseURL = import.meta.env.VITE_FRONTEND_URL
+const baseURL = import.meta.env.VITE_APP_DOMAIN
 
 /*
 created_at

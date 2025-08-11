@@ -57,7 +57,7 @@ type Stats = {
 }
 
 const WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'N/A']
-const URL_DOMAIN = import.meta.env.VITE_URL_DOMAIN
+const URL_DOMAIN = import.meta.env.VITE_SERVER_DOMAIN
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();

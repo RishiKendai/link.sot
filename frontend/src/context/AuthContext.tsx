@@ -16,7 +16,7 @@ export interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const API_BASE = import.meta.env.VITE_FRONTEND_URL || '';
+const API_BASE = import.meta.env.VITE_APP_DOMAIN || '';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const navigate = useNavigate();

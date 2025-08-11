@@ -41,8 +41,8 @@ export function useApiMutation<TPayload = unknown, TResponse = unknown>(mutation
     return useMutation<ResponseProps<TResponse>, unknown, RequestParams<TPayload>>({
         mutationKey,
         mutationFn: async ({ path, method, payload, headers }: RequestParams<TPayload>) => {
-            const BASE_URL = import.meta.env.VITE_FRONTEND_URL;
-            // const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const BASE_URL = import.meta.env.VITE_APP_DOMAIN;
+            // const BASE_URL = import.meta.env.VITE_SERVER_DOMAIN;
             const url = `${BASE_URL}/proxy${path}`;
             // const url = `${BASE_URL}${path}`;
             try {

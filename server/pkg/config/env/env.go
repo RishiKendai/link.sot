@@ -62,9 +62,9 @@ func EnvRedisURI() string {
 
 func EnvSOTDomain() string {
 	CheckEnv()
-	domain := os.Getenv("SOT_DOMAIN")
+	domain := os.Getenv("SERVER_DOMAIN")
 	if domain == "" {
-		fmt.Println("SOT_DOMAIN is not set")
+		fmt.Println("SERVER_DOMAIN is not set")
 	}
 	return domain
 }

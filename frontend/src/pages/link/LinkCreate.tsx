@@ -37,7 +37,7 @@ const LinkCreate = () => {
         return `${day}-${month}-${year} - ${hours}:${minutes}`
     };
 
-    const baseURL = import.meta.env.VITE_FRONTEND_URL
+    const baseURL = import.meta.env.VITE_APP_DOMAIN
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

@@ -5,8 +5,8 @@ import { sanitizeData } from '../utils/sanitizeData';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-// const API_BASE = import.meta.env.VITE_API_BASE_URL;
-const API_BASE = import.meta.env.VITE_FRONTEND_URL;
+// const API_BASE = import.meta.env.VITE_SERVER_DOMAIN;
+const API_BASE = import.meta.env.VITE_APP_DOMAIN;
 
 type UseApiQueryOptions = {
     path: string;
