@@ -1,9 +1,9 @@
 package response
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -48,17 +48,23 @@ func ServeHTML(c *gin.Context, status int, name string, obj interface{}) {
 }
 
 // ServeHTMLFile serves an HTML file from the static directory with the given status code.
-func ServeHTMLFile(c *gin.Context, filename string, status int) {
+func ServeHTMLFile(c *gin.Context, filename string, status int, data any) {
 	fullPath := filepath.Join("templates", filename)
-	file, err := os.Open(fullPath)
+	tmpl, err := template.ParseFiles(fullPath)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Internal Server Error")
+		c.String(http.StatusInternalServerError, "Template parsing error: %v", err)
 		return
 	}
-	defer file.Close()
 
-	c.DataFromReader(status, -1, "text/html; charset=utf-8", file, nil)
+	// Write status code and content type
+	c.Status(status)
+	c.Header("Content-Type", "text/html; charset=utf-8")
 
+	// Execute template with data
+	if err := tmpl.Execute(c.Writer, data); err != nil {
+		c.String(http.StatusInternalServerError, "Template execution error: %v", err)
+		return
+	}
 }
 
 /* ---------------- Error Functions ---------------- */
