@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 // const API_BASE = import.meta.env.VITE_SERVER_DOMAIN;
-const API_BASE = import.meta.env.VITE_API_DOMAIN;
+// const API_BASE = import.meta.env.VITE_API_DOMAIN;
 
 type UseApiQueryOptions = {
     path: string;
@@ -32,8 +32,9 @@ type ErrorResponse = {
 export type ResponseProps<T = unknown> = (SuccessResponse<T>) | (ErrorResponse);
 
 function buildUrl(path: string, queryParams?: Record<string, unknown>): string {
-    const uri = `${API_BASE}${path}`;
-    const url = new URL(uri);
+    // const uri = `${API_BASE}${path}`;
+    // const url = new URL(uri);
+    const url = new URL(`/proxy${path}`, window.location.origin);
     const params = sanitizeData(queryParams || {});
     Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, String(v)));
     return url.toString();
