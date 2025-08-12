@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             try {
 
                 // const res = await fetch(`${API_BASE}/auth-status`, {
-                const res = await fetch(`/auth-status`, {
+                const res = await fetch(`/proxy/auth-status`, {
                     method: 'GET',
                     credentials: 'include',
                 });
