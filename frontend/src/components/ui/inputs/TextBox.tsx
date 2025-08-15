@@ -20,6 +20,7 @@ interface TextBoxProps {
     disabled?: boolean;
     srOnly?: boolean;
     onClick?: () => void;
+    handleBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
     readOnly?: boolean;
 }
 
@@ -41,6 +42,7 @@ const TextBox: React.FC<TextBoxProps> = ({
     disabled = false,
     srOnly = false,
     onClick = () => { },
+    handleBlur,
     readOnly = false,
 }) => {
     return (
@@ -72,6 +74,7 @@ const TextBox: React.FC<TextBoxProps> = ({
                     disabled={disabled}
                     autoComplete='on'
                     readOnly={readOnly}
+                    onBlur={handleBlur ? handleBlur : undefined}
                     
                     className={`textbox - input ${className || ''} text - [var(--text-primary)] outline-0 border-0 bg-transparent w-full ${disabled ? 'text-gray-400 cursor-not-allowed' : ''}`}
                 />
