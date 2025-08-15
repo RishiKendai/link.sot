@@ -25,6 +25,7 @@ type SuccessResponse<T = unknown> = {
 
 type ErrorResponse = {
     error: string;
+    status_code: number;
     status: 'error';
     message?: string;
 };
@@ -84,6 +85,7 @@ export function useApiQuery<TResponse = unknown>({
             if (!res.ok) {
                 return {
                     status: 'error',
+                    status_code: res.status,
                     error: (json && 'error' in json) ? json.error : (`error::${res.status}_${res.statusText}`).toLowerCase(),
                     message: (json && 'message' in json) ? json.message : '',
                 };
@@ -100,6 +102,7 @@ export function useApiQuery<TResponse = unknown>({
                             : 'An unknown error occurred';
             return {
                 status: 'error',
+                status_code: 500,
                 error: errorMessage,
                 message: errorMessage,
             };

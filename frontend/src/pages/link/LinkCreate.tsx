@@ -109,7 +109,7 @@ const LinkCreate = () => {
             return;
         }
         console.log('data ', data)
-        if (data && data.status === 'error' && data.error === 'error::409_conflict') {
+        if (data && data.status === 'error' && data.status_code === 409) {
             setIsSCAvailable(false);
             setFormError({ customBackHalf: 'Short code already exists' });
             return;
