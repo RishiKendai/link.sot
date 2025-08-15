@@ -84,7 +84,7 @@ export function useApiQuery<TResponse = unknown>({
             if (!res.ok) {
                 return {
                     status: 'error',
-                    error: (json && 'error' in json) ? json.error : `Error ${res.status}: ${res.statusText}`,
+                    error: (json && 'error' in json) ? json.error : (`error::${res.status}_${res.statusText}`).toLowerCase(),
                     message: (json && 'message' in json) ? json.message : '',
                 };
             }

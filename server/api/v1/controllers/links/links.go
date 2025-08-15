@@ -53,6 +53,18 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		} else {
 			isCustomBackoff = true
 		}
+
+		isAvailable, err := IsAliasAvailable(sc, "")
+		if err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+
+		if !isAvailable {
+			response.SendConflictError(c, "Alias is already in use")
+			return
+		}
+
 		uidRaw, exists := c.Get("uid")
 		if !exists {
 			response.SendServerError(c, nil)
@@ -68,7 +80,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		} else {
 			expiry = expiry.UTC()
 		}
-		_, err := postgres.InsertOne(query, uid, payload.Original_url, sc, expiry, payload.Password, payload.Is_flagged, isCustomBackoff, payload.Tags)
+		_, err = postgres.InsertOne(query, uid, payload.Original_url, sc, expiry, payload.Password, payload.Is_flagged, isCustomBackoff, payload.Tags)
 		if err != nil {
 			response.SendServerError(c, err)
 			return
@@ -129,7 +141,7 @@ func CheckAliasAvailabilityHandler() gin.HandlerFunc {
 		if isAvailable {
 			response.SendStatus(c, http.StatusOK)
 		} else {
-			response.SendStatus(c, http.StatusForbidden)
+			response.SendStatus(c, http.StatusConflict)
 		}
 	}
 }
@@ -433,7 +445,6 @@ func GetLinkHandler() gin.HandlerFunc {
 			return
 		}
 		link.FullShortLink = fullShortLink
-		fmt.Printf("%+v\n", link)
 
 		lJSON, _ := json.Marshal(link)
 		duration := time.Minute * 5

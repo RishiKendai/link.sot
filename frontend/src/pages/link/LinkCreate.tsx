@@ -10,6 +10,9 @@ import { useNavigate } from 'react-router-dom'
 import Alert from '../../components/ui/Alert'
 import { useQueryClient } from '@tanstack/react-query'
 import { validateField } from '../../utils/validation'
+import { useApiQuery } from '../../hooks/useApiQuery'
+import { toast } from 'sonner'
+import Loader from '../../components/ui/Loader'
 
 const LinkCreate = () => {
     const [url, setUrl] = useState('')
@@ -19,10 +22,16 @@ const LinkCreate = () => {
     const [password, setPassword] = useState('')
     const [tags, setTags] = useState<string[]>([])
     const [formError, setFormError] = useState<Record<string, string>>({})
+    const [isSCAvailable, setIsSCAvailable] = useState(false)
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const { mutate: createLink } = useApiMutation(['create-link']);
+    const { mutate: createLink, isPending: isCreatingLink } = useApiMutation(['create-link']);
+    const { isFetching:isCheckingSCAvailability, refetch: checkSCAvailability } = useApiQuery({
+        path: `/links/availability/${customBackHalf}`,
+        key: ['check-sc-availability', customBackHalf],
+        enabled: false
+    });
     const [error, setError] = useState('');
 
     // Helper function to format date for display
@@ -37,7 +46,7 @@ const LinkCreate = () => {
         return `${day}-${month}-${year} - ${hours}:${minutes}`
     };
 
-    const baseURL = import.meta.env.VITE_SERVERS_DOMAIN
+    const baseURL = import.meta.env.VITE_SERVER_DOMAIN
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -45,6 +54,10 @@ const LinkCreate = () => {
         if (!originalURL) return;
         setFormError({});
         setError('');
+        if (!isSCAvailable) {
+            setError('Short code is not available. Please check the custom back-half or leave it empty for auto-generation.');
+            return
+        }
         createLink({
             path: '/links',
             method: 'POST',
@@ -76,6 +89,35 @@ const LinkCreate = () => {
         });
     }
 
+
+    const checkAvailability = async () => {
+        if (!customBackHalf) {
+            setIsSCAvailable(true);
+            return;
+        }
+        if (customBackHalf.length < 7 || customBackHalf.length > 12) {
+            setIsSCAvailable(false);
+            setFormError({ customBackHalf: 'Short code must be between 7 and 12 characters long' });
+            return;
+        }
+
+        const { data, error: checkSCError } = await checkSCAvailability();
+        if (checkSCError) {
+            setIsSCAvailable(false);
+            toast.error("Failed to check short code availability")
+            console.error('Failed to check short code availability:: ', checkSCError);
+            return;
+        }
+        console.log('data ', data)
+        if (data && data.status === 'error' && data.error === 'error::409_conflict') {
+            setIsSCAvailable(false);
+            setFormError({ customBackHalf: 'Short code already exists' });
+            return;
+        }
+        setIsSCAvailable(true);
+        setFormError({});
+    }
+
     return (
         <section className='min-h-screen flex flex-col py-8 w-full'>
             <form onSubmit={handleSubmit}>
@@ -97,27 +139,34 @@ const LinkCreate = () => {
 
                         {/* Custom back-half */}
                         <div className='card-item'>
-                            <div className='flex items-end gap-2 w-full'>
-                                <TextBox
-                                    label='Custom Back-Half'
-                                    name='custom-back-half'
-                                    type='text'
-                                    placeholder='custom-back-half'
-                                    id='custom-back-half-base'
-                                    value={baseURL}
-                                    className='text-gray-400'
-                                    disabled
-                                />
-                                <span className='text-black leading-6 py-2'>/</span>
-                                <TextBox
-                                    name='custom-back-half'
-                                    type='text'
-                                    placeholder='custom-back-half'
-                                    id='custom-back-half'
-                                    value={customBackHalf}
-                                    wrapperClass='w-full'
-                                    onChange={(e) => setCustomBackHalf(e.target.value)}
-                                />
+                            <div className='flex flex-col'>
+                                <label className='w-fit text-sm font-medium text-gray-700 mb-2'>Custom Back-Half</label>
+                                <div className='flex items-start gap-2 w-full'>
+                                    <TextBox
+                                        // label='Custom Back-Half'
+                                        name='custom-back-half'
+                                        type='text'
+                                        placeholder='custom-back-half'
+                                        id='custom-back-half-base'
+                                        value={baseURL}
+                                        className='text-gray-400'
+                                        wrapperClass='w-72'
+                                        disabled
+                                    />
+                                    <span className='text-black leading-6 py-2'>/</span>
+                                    <TextBox
+                                        name='custom-back-half'
+                                        type='text'
+                                        placeholder='custom-back-half'
+                                        id='custom-back-half'
+                                        value={customBackHalf}
+                                        wrapperClass='w-full'
+                                        onChange={(e) => setCustomBackHalf(e.target.value)}
+                                        handleBlur={() => checkAvailability()}
+                                        error={formError.customBackHalf}
+                                    />
+                                    {isCheckingSCAvailability && <Loader color='#3b82f6' className='my-auto min-h-4 min-w-4' />}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -177,7 +226,7 @@ const LinkCreate = () => {
                     {error && <Alert type='danger' message={error} className='mb-4' />}
                     <div className='flex w-full justify-end'>
                         <Button className='text-sm mr-4' label='Cancel' type='button' variant='tertiary' onClick={() => navigate(-1)} />
-                        <Button className='text-sm ' isPending={false} label='Shorten Link' type='submit' variant='primary' />
+                        <Button className='text-sm ' isPending={isCreatingLink} label='Shorten Link' type='submit' variant='primary' />
                     </div>
                 </div>
             </form>

@@ -156,6 +156,9 @@ func fetchMetadata(link string) (*PreviewData, error) {
 }
 
 func IsAliasAvailable(alias string, excludeShortLink string) (bool, error) {
+	if len(alias) < 7 || len(alias) > 12 {
+		return false, fmt.Errorf("alias must be between 7 and 12 characters long")
+	}
 	query := "SELECT short_link FROM links WHERE short_link = $1"
 	args := []any{alias}
 

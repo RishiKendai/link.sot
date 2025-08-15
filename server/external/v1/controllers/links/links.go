@@ -188,6 +188,17 @@ func CreateShortURLHandler() gin.HandlerFunc {
 			isCustom = true
 		}
 
+		isAvailable, err := IsAliasAvailable(sc, "")
+		if err != nil {
+			response.SendServerError(c, err)
+			return
+		}
+
+		if !isAvailable {
+			response.SendConflictError(c, "Alias is already in use")
+			return
+		}
+
 		// Get user UID from context
 		uidRaw, exists := c.Get("uid")
 		if !exists {
@@ -213,7 +224,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		`
 
-		_, err := postgres.InsertOne(
+		_, err = postgres.InsertOne(
 			query,
 			uid,
 			payload.Original_url,
