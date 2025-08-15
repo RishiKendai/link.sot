@@ -61,7 +61,7 @@ func CreateShortURLHandler() gin.HandlerFunc {
 		uid := uidRaw.(string)
 
 		// Prepare query and args for optional fields
-		query := "INSERT INTO links (user_uid, original_link, short_link, expiry_date, password, is_flagged, is_custom_backoff, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
+		query := "INSERT INTO links (user_uid, original_link, short_link, expiry_date, password, is_flagged, is_custom_backoff, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 		expiry := payload.Expiry_date
 		if expiry.IsZero() {
 			expiry = time.Now().Add(30 * 24 * time.Hour).UTC() // default 30 days, force UTC
@@ -100,7 +100,7 @@ func QuickShortURL(uid, l string) (string, error) {
 	sc := encodeBase62Fixed(counterVal, 7)
 
 	// Prepare query and args for optional fields
-	query := "INSERT INTO links (user_uid, original_link, short_link, expiry_date, password, is_flagged, is_custom_backoff, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
+	query := "INSERT INTO links (user_uid, original_link, short_link, expiry_date, password, is_flagged, is_custom_backoff, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 	r, err := postgres.InsertOne(query, uid, l, sc, exp_date, sql.NullString{}, false, false, false, []string{})
 	if err != nil {
 		log.Println("Error: ", err)
