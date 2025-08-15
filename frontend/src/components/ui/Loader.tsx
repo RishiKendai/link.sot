@@ -10,7 +10,7 @@ type LoaderProps = {
 const Loader: React.FC<LoaderProps> = ({ className, color }) => {
     return (
         <span
-            className={clsx('loader h-7 w-7 border-t-3', className)}
+            className={clsx('loader border-t-3', className, !className && 'w-7 h-7')}
             style={{ ['--loader-color' as string]: color }}
         ></span>
     );
