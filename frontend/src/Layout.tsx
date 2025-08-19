@@ -18,7 +18,7 @@ export default function NavWrapper() {
         <main className={clsx('flex', isLandingPage ? 'pt-0' : 'pt-24 md:pt-0')}>
           <Outlet />
         </main>
-        <Toaster position='bottom-left' />
+        <Toaster position='bottom-left' theme='dark' />
       </Suspense>
     </>
   );
